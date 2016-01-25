@@ -1,0 +1,2 @@
+Objectif 1° semaine : - Fenêtre Graphique + un truc dedans
+					  - Parsing d'un fichier xml
