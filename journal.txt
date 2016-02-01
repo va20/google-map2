@@ -1,2 +1,2 @@
-Objectif 1° semaine : - Fenêtre Graphique + un truc dedans
+Objectif 1° semaine : - Fenêtre Graphique + un truc dedans ||OK
 					  - Parsing d'un fichier xml
