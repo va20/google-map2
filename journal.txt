@@ -1,2 +1,4 @@
 Objectif 1° semaine : - Fenêtre Graphique + un truc dedans ||OK
-					  - Parsing d'un fichier xml
+					  - Parsing d'un fichier XML
+
+Objectif 3° semaine : -Parsing du fichier XML
