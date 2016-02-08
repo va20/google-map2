@@ -1,0 +1,2 @@
+main: main.o
+gcc main.c -o main.o -Wall -lSDL2
