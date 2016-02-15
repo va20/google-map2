@@ -1,7 +1,6 @@
 #include "parser.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 /*
 unite.h def de types+prototypes utiliser par d'autre unité
 unite.c implementation
@@ -12,6 +11,9 @@ unite.c implementation
 int main(int argc,char *argv[]){
 	int cmpNode,cmpTag;
 	cmpNode=0;cmpTag=0;
+	int cmpTag_way=0;
+	int cmp_way=0;
+	int cmpNd=0;
 	if(argc >2){
 		fprintf(stderr, "erreur nombre d'arguments\n");
 		return -1;
@@ -32,7 +34,6 @@ int main(int argc,char *argv[]){
 	Tree_Retrieve(xml_nodePtr,&all);
 	printf("avant while in main\n");
 	if(all.Array_Bounds!=NULL){
-		//printf("%d\n",sizeof(all));	
 		printf("on est dans le main (bounds)\n");
 		printf("%s\n",all.Array_Bounds->minlat);
 		printf("%s\n",all.Array_Bounds->minlon);
@@ -41,22 +42,40 @@ int main(int argc,char *argv[]){
 		
 	}
 	while(all.Array_Node!=NULL){
-		if(all.Array_Node->node_child!=NULL){
+		if(all.Array_Node->node_tag!=NULL){
 			Tag* tmp=NULL;
-			tmp=all.Array_Node->node_child;
+			tmp=all.Array_Node->node_tag;
 			while(tmp!=NULL){
 				cmpTag++;
+				//printf("tag name : %s\n",tmp->key );
+				//printf("tag val : %s\n",tmp->value );
 				tmp=tmp->suivant;
 			}
 		}
-		/*printf("on est dans le main (Node)\n");
-		printf("%s\n",all.Array_Node->id);
-		printf("%s\n",all.Array_Node->visible);
-		printf("%s\n",all.Array_Node->lon);
-		printf("%s\n",all.Array_Node->lat);*/
 		cmpNode++;
 		all.Array_Node=all.Array_Node->suivant;
 	}
+	while(all.Array_Way!=NULL){
+		if(all.Array_Way->way_tag!=NULL){
+			Tag* tmp=NULL;
+			tmp=all.Array_Way->way_tag;
+			Nd* tmp2=NULL;
+			tmp2=all.Array_Way->ref;
+			while(tmp!=NULL){
+				cmpTag_way++;
+				tmp=tmp->suivant;
+			}
+			while(tmp2!=NULL){
+				cmpNd++;
+				tmp2=tmp2->next_nd;
+			}
+		}
+		cmp_way++;
+		all.Array_Way=all.Array_Way->next_way;
+	}
+	printf("nombre de way %d\n",cmp_way );
+	printf("nombre de tag_way %d\n",cmpTag_way);
+	printf("nombre de nd dans way %d\n",cmpNd);
 	printf("nombre de nodes %d\n",cmpNode );
 	printf("nombre de tag %d\n",cmpTag);
 	printf("c bon \n");
