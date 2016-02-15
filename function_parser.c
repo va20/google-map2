@@ -41,7 +41,7 @@ Bounds* Bounds_Retrieve(xmlNodePtr xml_node){
 //methode pour recuperer les valeurs de chaque tag
 Tag* Tag_Retrieve(xmlNodePtr xml_node){
 	static int cmpTag=0;
-	Tag* tag;
+	Tag* tag=NULL;
 	tag=malloc(sizeof(Tag));
 
 	tag->key=(char *)xmlGetProp(xml_node,(const xmlChar *)"k");
@@ -52,6 +52,17 @@ Tag* Tag_Retrieve(xmlNodePtr xml_node){
 	return tag;
 }
 
+Member* Member_Retrieve(xmlNodePtr xml_member){
+	static int cmpMem=0;
+	Member* member=NULL;
+	member=malloc(sizeof(Member));
+	member->type=(char*)xmlGetProp(xml_member,(const xmlChar*)"type");
+	member->ref=(char*)xmlGetProp(xml_member,(const xmlChar*)"ref");
+	member->role=(char*)xmlGetProp(xml_member,(const xmlChar*)"role");
+	member->next_member=NULL;
+	printf("member %d\n",cmpMem);
+	return member;
+}
 
 Node* Tag_add_Node(xmlNodePtr tag_To_add,Node* node){
 	Tag* tag=NULL;
@@ -183,10 +194,73 @@ Array_All* Way_add(xmlNodePtr way_To_add,Array_All* all){
 	return all;
 }
 
+Relation* Member_add_Relation(xmlNodePtr member_To_add,Relation* relation){
+	Member* member=NULL;
+	if(relation->member_fils==NULL){
+		member=Member_Retrieve(member_To_add);
+		relation->member_fils=member;
+		return relation;
+	}
+	member=Member_Retrieve(member_To_add);
+	member->next_member=relation->member_fils;
+	relation->member_fils=member;
+	return relation;
+}
+
+Relation* Tag_add_Relation(xmlNodePtr tag_To_add,Relation* relation){
+	Tag* tag=NULL;
+	if(relation->tag_fils==NULL){
+		tag=Tag_Retrieve(tag_To_add);
+		relation->tag_fils=tag;
+		return relation;
+	}
+	tag=Tag_Retrieve(tag_To_add);
+	tag->suivant=relation->tag_fils;
+	relation->tag_fils=tag;
+	return relation;
+}
+
+Relation* Relation_Retrieve(xmlNodePtr xml_relation){
+	Relation* relation=NULL;
+	relation=malloc(sizeof(Relation));
+	relation->id=(char*)xmlGetProp(xml_relation,(const xmlChar*)"id");
+	relation->visible=(char*)xmlGetProp(xml_relation,(const xmlChar*)"visible");
+	relation->member_fils=NULL;
+	relation->tag_fils=NULL;
+	relation->next_relation=NULL;
+	if(xml_relation->children!=NULL){
+		xml_relation=xml_relation->xmlChildrenNode;
+		while(xml_relation->next!=NULL){
+			if((!xmlStrcmp(xml_relation->name,(const xmlChar*)"tag"))){
+				relation=Tag_add_Relation(xml_relation,relation);
+			}
+			if((!xmlStrcmp(xml_relation->name,(const xmlChar*)"member"))){
+				relation=Member_add_Relation(xml_relation,relation);
+			}
+			xml_relation=xml_relation->next;
+		}
+	}
+	return relation;
+}
+
+Array_All* Relation_add(xmlNodePtr relation_to_add,Array_All* all){
+	Relation* relation=NULL;
+	if(all->Array_Relation==NULL){
+		relation=Relation_Retrieve(relation_to_add);
+		all->Array_Relation=relation;
+		return all;
+	}
+	relation=Relation_Retrieve(relation_to_add);
+	relation->next_relation=all->Array_Relation->next_relation;
+	all->Array_Relation->next_relation=relation;
+	return all;
+}
+
 //methode pour parcourir le fichier xml et stocker les valeurs recupere
 void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 	static int nombre_node=0;
 	static int nombre_way=0;
+	static int nombre_relation=0;
 	printf("Tree : %s\n",nodePtr->name);
 	nodePtr=nodePtr->xmlChildrenNode;
 	nodePtr=nodePtr->next;
@@ -204,11 +278,17 @@ void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 			nombre_way++;
 
 		}
+		else if ((!xmlStrcmp(nodePtr->name,(const xmlChar *)"relation")))
+		{
+			tab=Relation_add(nodePtr,tab);
+			nombre_relation++;
+		}
 		nodePtr=nodePtr->next;
 		
 		
 	}
 	printf("nombre de node dans tree : %d\n",nombre_node );
 	printf("nombre de way dans tree : %d\n",nombre_way );
+	printf("nombre de relation dans tree : %d\n",nombre_relation );
 	return;
 }

@@ -26,4 +26,12 @@ Way* Nd_add_Way(xmlNodePtr,Way*);
 
 Nd* Nd_Retrieve(xmlNodePtr);
 
+Relation* Relation_Retrieve(xmlNodePtr);
+
+Relation* Tag_add_Relation(xmlNodePtr,Relation*);
+
+Relation* Member_add_Relation(xmlNodePtr,Relation*);
+
+Array_All* Relation_add(xmlNodePtr,Array_All*);
+
 Bounds* Bounds_Retrieve(xmlNodePtr);
