@@ -14,6 +14,9 @@ int main(int argc,char *argv[]){
 	int cmpTag_way=0;
 	int cmp_way=0;
 	int cmpNd=0;
+	int cmp_Relation=0;
+	int cmp_member=0;
+	int cmp_member_tag=0;
 	if(argc >2){
 		fprintf(stderr, "erreur nombre d'arguments\n");
 		return -1;
@@ -27,6 +30,7 @@ int main(int argc,char *argv[]){
 	all.Array_Bounds=NULL;
 	all.Array_Node=NULL;
 	all.Array_Way=NULL;
+	all.Array_Relation=NULL;
 	xmlDocPtr xmlFile=NULL;
 	xmlNodePtr xml_nodePtr=NULL;
 	xmlFile=Document_Parser(argv[1]);
@@ -73,11 +77,33 @@ int main(int argc,char *argv[]){
 		cmp_way++;
 		all.Array_Way=all.Array_Way->next_way;
 	}
+	while(all.Array_Relation!=NULL){
+		if (all.Array_Relation->member_fils!=NULL){
+			Member* tmp=NULL;
+			Tag* tmp2=NULL;
+			tmp=all.Array_Relation->member_fils;
+			tmp2=all.Array_Relation->tag_fils;
+			while(tmp!=NULL){
+				cmp_member++;
+				tmp=tmp->next_member;
+			}
+			while(tmp2!=NULL){
+				cmp_member_tag++;
+				tmp2=tmp2->suivant;
+			}
+			cmp_Relation++;
+			all.Array_Relation=all.Array_Relation->next_relation;
+
+		}
+	}
 	printf("nombre de way %d\n",cmp_way );
 	printf("nombre de tag_way %d\n",cmpTag_way);
 	printf("nombre de nd dans way %d\n",cmpNd);
 	printf("nombre de nodes %d\n",cmpNode );
 	printf("nombre de tag %d\n",cmpTag);
+	printf("nombre de relation %d\n",cmp_Relation);
+	printf("nombre de member %d\n",cmp_member);
+	printf("nombre de tag dans relation %d\n",cmp_member_tag );
 	printf("c bon \n");
 	return 0;
 }

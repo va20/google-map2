@@ -60,6 +60,7 @@ Member* Member_Retrieve(xmlNodePtr xml_member){
 	member->ref=(char*)xmlGetProp(xml_member,(const xmlChar*)"ref");
 	member->role=(char*)xmlGetProp(xml_member,(const xmlChar*)"role");
 	member->next_member=NULL;
+	cmpMem++;
 	printf("member %d\n",cmpMem);
 	return member;
 }

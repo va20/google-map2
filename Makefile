@@ -11,8 +11,7 @@ OBJ=$(SRC:.c=.o)
 
 
 
-all: $(TARGET)
-parser: $(OBJ)
+all:$(OBJ)
 	$(CC) -o $@ $^ $(CPPFLAGS) $(LDFLAGS) $(SDLFLAG)
 
 %.o: %.c %.h
