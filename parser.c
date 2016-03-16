@@ -9,6 +9,13 @@ unite.c implementation
  */
 
 int main(int argc,char *argv[]){
+	
+	AVL_tree_node tree;
+	tree.root=NULL;
+	tree=*init_tree_node();
+	
+
+
 	int cmpNode,cmpTag;
 	cmpNode=0;cmpTag=0;
 	int cmpTag_way=0;
@@ -21,30 +28,47 @@ int main(int argc,char *argv[]){
 		fprintf(stderr, "erreur nombre d'arguments\n");
 		return -1;
 	}
-	/*if(argv[1]!="map.osm"){
-		fprintf(stderr, "erreur format \n");
-		return -2;
-	}*/
 
 	Array_All all;
 	all.Array_Bounds=NULL;
 	all.Array_Node=NULL;
 	all.Array_Way=NULL;
 	all.Array_Relation=NULL;
+
+	
 	xmlDocPtr xmlFile=NULL;
 	xmlNodePtr xml_nodePtr=NULL;
 	xmlFile=Document_Parser(argv[1]);
 	xml_nodePtr=Root_Retrieve(xmlFile);
 	Tree_Retrieve(xml_nodePtr,&all);
-	printf("avant while in main\n");
-	if(all.Array_Bounds!=NULL){
-		printf("on est dans le main (bounds)\n");
-		printf("%s\n",all.Array_Bounds->minlat);
-		printf("%s\n",all.Array_Bounds->minlon);
-		printf("%s\n",all.Array_Bounds->maxlat);
-		printf("%s\n",all.Array_Bounds->minlon);
-		
-	}
+	
+	insertion_node(&tree,all.Array_Node);
+	printf("affichage main\n");
+	printf("%s\n",tree.root->id );
+	printf("%p\n",tree.root->left);
+	all.Array_Node=all.Array_Node->suivant;
+	insertion_node(&tree,all.Array_Node);
+	all.Array_Node=all.Array_Node->suivant;
+	insertion_node(&tree,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree.root);
+	/*all.Array_Node=all.Array_Node->suivant;
+	insertion_node(&tree,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree.root);
+	all.Array_Node=all.Array_Node->suivant;
+	insertion_node(&tree,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree.root);
+	all.Array_Node=all.Array_Node->suivant;
+	insertion_node(&tree,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree.root);
+	all.Array_Node=all.Array_Node->suivant;
+	insertion_node(&tree,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree.root);*/
+
 	while(all.Array_Node!=NULL){
 		if(all.Array_Node->node_tag!=NULL){
 			Tag* tmp=NULL;
@@ -57,6 +81,8 @@ int main(int argc,char *argv[]){
 			}
 		}
 		cmpNode++;
+		
+		//insertion_node(&node,all.Array_Node);
 		all.Array_Node=all.Array_Node->suivant;
 	}
 	while(all.Array_Way!=NULL){
@@ -96,6 +122,7 @@ int main(int argc,char *argv[]){
 
 		}
 	}
+	/*printf("%d\n",height_node(&node) );
 	printf("nombre de way %d\n",cmp_way );
 	printf("nombre de tag_way %d\n",cmpTag_way);
 	printf("nombre de nd dans way %d\n",cmpNd);
@@ -104,6 +131,6 @@ int main(int argc,char *argv[]){
 	printf("nombre de relation %d\n",cmp_Relation);
 	printf("nombre de member %d\n",cmp_member);
 	printf("nombre de tag dans relation %d\n",cmp_member_tag );
-	printf("c bon \n");
+	printf("c bon \n");*/
 	return 0;
 }

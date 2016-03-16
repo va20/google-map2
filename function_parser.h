@@ -15,6 +15,7 @@ typedef struct Relation Relation;
 typedef struct Member Member;
 typedef struct Array_All Array_All;
 
+
 struct Bounds{
 	char *minlat;
 	char *minlon;
@@ -32,6 +33,7 @@ struct Nd{
 	char* ref;
 	Nd* next_nd;
 };
+
 struct Node{
 	char *id;
 	char *visible;
@@ -65,6 +67,7 @@ struct Member{
 	char* role;
 	Member* next_member;
 };
+
 struct Relation{
 	char* id;
 	char* visible;

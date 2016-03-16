@@ -1,6 +1,7 @@
 #include "tree_structure.h"
+//creation de l'arbre tree_node
 
-//creation de l'arbre tree_node 
+
 AVL_tree_node* init_tree_node(){
 	AVL_tree_node* tree_node=NULL;
 	tree_node=(AVL_tree_node*)malloc(sizeof(AVL_tree_node));
@@ -71,6 +72,8 @@ int height_node(AVL_node* avl_tree_node){
 	if(avl_tree_node->right!=NULL){
 		right_height=1+height_node(avl_tree_node->right);
 	}
+	//printf(" hauteur left %d\n",left_height );
+	//printf("hauteur right %d\n",right_height );
 	return max(left_height,right_height);
 }
 
@@ -79,12 +82,12 @@ int balance_node(AVL_node* avl_tree_node){
 	int right_height=0;
 	if (avl_tree_node->left!=NULL)
 	{
-		left_height=height_node(avl_tree_node->left);
+		left_height=height_node(avl_tree_node);
 	}
 	if (avl_tree_node->right!=NULL)
 	{
 		/* code */
-		right_height=height_node(avl_tree_node->right);
+		right_height=height_node(avl_tree_node);
 	}
 	return left_height-right_height;
 }
@@ -94,9 +97,11 @@ AVL_node* left_To_leftRot(AVL_node* node){
 	AVL_node* tmp=NULL;
 	AVL_node* tmp2=NULL;
 	tmp=node;
-	tmp2=node->left;
+	tmp2=tmp->left;
 	tmp->left=tmp2->right;
 	tmp2->right=tmp;
+	printf("dans left to left \n");
+	affiche(tmp2);
 	return tmp2;
 }
 
@@ -108,9 +113,15 @@ AVL_node* right_To_rightRot(AVL_node* node){
 	tmp->right=tmp2->left;
 	tmp2->left=tmp;
 	return tmp2;
+
 }
 
 AVL_node* left_To_rightRot(AVL_node* node){
+	/*AVL_node *tmp = node -> left;
+	node -> left = tmp -> right;
+	tmp -> right = node;
+	return tmp;*/
+
 	AVL_node* tmp=NULL;
 	AVL_node* tmp2=NULL;
 	AVL_node* tmp3=NULL;
@@ -125,6 +136,12 @@ AVL_node* left_To_rightRot(AVL_node* node){
 }
 
 AVL_node* right_To_leftRot(AVL_node* node){
+	/*AVL_node *tmp = node -> right;
+	node -> right = tmp-> left;
+	tmp  -> left  = node;
+	return tmp;*/
+
+	
 	AVL_node* tmp=NULL;
 	AVL_node* tmp2=NULL;
 	AVL_node* tmp3=NULL;
@@ -136,10 +153,17 @@ AVL_node* right_To_leftRot(AVL_node* node){
 	tmp3->left=tmp;
 	tmp3->right=tmp2;
 	return tmp3;
+	
 }
 
+
+
 AVL_node* getNode_balanced(AVL_node* node){
-	AVL_node* new_node=NULL;
+	/*int lh = height_node(node -> left);
+	int ll = height_node(node -> right);
+	if (abs(lh - ll) <= 1)
+		return node;*/
+	//AVL_node* new_node=NULL;
 	int balance_value=0;
 	if(node->left!=NULL){
 		node->left=getNode_balanced(node->left);
@@ -148,59 +172,77 @@ AVL_node* getNode_balanced(AVL_node* node){
 		node->right=getNode_balanced(node->right);
 	}
 	balance_value=balance_node(node);
+	printf("factor %d\n",balance_value );
 	if(balance_value>=2){
 		int n=balance_node(node->left);
 		if(n<=-1){
-			new_node=left_To_rightRot(node);
+			printf("left to right\n");
+			node=left_To_rightRot(node);
 		}
 		else{
-			new_node=left_To_leftRot(node);
+			printf("left to left\n");
+			node=left_To_leftRot(node);
 		}
 	}
 	else if(balance_value<=-2){
 		int n=balance_node(node->right);
 		if(n>=1){
-			new_node=right_To_leftRot(node);
+			printf("right to left\n");
+			node=right_To_leftRot(node);
 		}
 		else{
-			new_node=right_To_rightRot(node);
+			printf("right to right\n");
+			node=right_To_rightRot(node);
 		}
 	}
-	else{
-		new_node=node;
-	}
 
-	return new_node;
+	return node;
 }
-void insertion_node(AVL_node* avl_node,Node* list_node){
+void insertion_node(AVL_tree_node* avl_tree_node,Node* list_node){
+	printf("je suis dans insertion\n");
 	AVL_node* tmp=NULL;
-	AVL_node* new_node=NULL;
-	tmp=avl_node;
-	if(avl_node==NULL){
-		avl_node=create_AVL_node(list_node);
+	if(avl_tree_node->root==NULL){
+		avl_tree_node->root=create_AVL_node(list_node);
+		printf("rien a faire\n");
+		return;
 	}
 	else{
-		while(tmp!=NULL){
+		tmp=avl_tree_node->root;
+		//printf("dans else\n");
+		while(tmp!=NULL && strcmp(tmp->id,list_node->id)!=0){
+			//printf("dans while\n");
+			//printf("%s\n",tmp->id );
+			//printf("list node %s\n",list_node->id );
 			if(strcmp(tmp->id,list_node->id)>0){
+				//printf("dans if while\n");
 				if(tmp->left!=NULL){
+					//printf("dans if 2 while\n");
 					tmp=tmp->left;
+				}
+				else{
+					tmp->left=create_AVL_node(list_node);
+					printf("avant equilibrage\n");
+					affiche(avl_tree_node->root);
+					avl_tree_node->root=getNode_balanced(avl_tree_node->root);
+					printf("apres equilibrage\n");
+					affiche(avl_tree_node->root);
 				}
 			}
 			else if(strcmp(tmp->id,list_node->id)<0){
+				//printf("dans else if while\n");
 				if(tmp->right!=NULL){
+					//printf("dans if 2 else if \n");
 					tmp=tmp->right;
+				}
+				else{
+					printf("avant equilibre droit\n");
+					tmp->right=create_AVL_node(list_node);
+					avl_tree_node->root=getNode_balanced(avl_tree_node->root);
+					printf("apres equilibre droit\n");
 				}
 			}
 		}
-		new_node=create_AVL_node(list_node);
-		if(strcmp(tmp->id,list_node->id)>0){
-			tmp->left=new_node;
-		}
-		else if(strcmp(tmp->id,list_node->id)<0){
-			tmp->right=new_node;
-		}
 	}
-	getNode_balanced(avl_node);
 }
 AVL_node* search(AVL_node* avl_node,char* ref){
 	AVL_node* tmp=NULL;
@@ -215,4 +257,33 @@ AVL_node* search(AVL_node* avl_node,char* ref){
 		}
 	}
 	return tmp;
+}
+
+void print_spc(int k) {
+	int i;
+	for (i = 0; i < k; i++)
+		printf (" ");
+}
+
+void affiche_indent(AVL_node* node, int k){
+	if(node==NULL){return;}
+	printf("%s\n",node->id);
+	affiche_indent(node->left,k + 1);
+	print_spc(k);
+	
+	affiche_indent(node->right, k + 1);
+}
+
+void affiche_suffixe(AVL_node* node, int k){
+	if(node==NULL){return;}
+	affiche_suffixe(node->left,k + 1);
+	printf("%s\n",node->id);
+	print_spc(k);
+	
+	affiche_suffixe(node->right, k + 1);
+}
+void affiche(AVL_node *node) {
+	affiche_indent(node, 0);
+	printf("affiche suffixe\n");
+	affiche_suffixe(node, 0);
 }

@@ -48,7 +48,7 @@ Tag* Tag_Retrieve(xmlNodePtr xml_node){
 	tag->value=(char *)xmlGetProp(xml_node,(const xmlChar *)"v");
 	tag->suivant=NULL;
 	cmpTag++;
-	printf("tag %d\n",cmpTag );
+	//printf("tag %d\n",cmpTag );
 	return tag;
 }
 
@@ -61,7 +61,7 @@ Member* Member_Retrieve(xmlNodePtr xml_member){
 	member->role=(char*)xmlGetProp(xml_member,(const xmlChar*)"role");
 	member->next_member=NULL;
 	cmpMem++;
-	printf("member %d\n",cmpMem);
+	//printf("member %d\n",cmpMem);
 	return member;
 }
 
@@ -96,10 +96,11 @@ Nd* Nd_Retrieve(xmlNodePtr xml_nd){
 	static int nb_nd=0;
 	Nd* nd=NULL;
 	nd=malloc(sizeof(Nd));
-	nd->ref=(char *)xmlGetProp(xml_nd,(const xmlChar *)"ref");
+	char* ref_node=(char *)xmlGetProp(xml_nd,(const xmlChar *)"ref");
+	nd->ref=ref_node; 
 	nd->next_nd=NULL;
 	nb_nd++;
-	printf("nd %d\n",nb_nd );
+	//printf("nd %d\n",nb_nd );
 	return nd;
 }
 
