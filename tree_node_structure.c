@@ -137,7 +137,7 @@ AVL_node* getNode_balanced(AVL_node* node){
 		return node;*/
 	//AVL_node* new_node=NULL;
 	int balance_value=0;
-	balance_value=height_node(node->left)-height_node(node->right);
+	balance_value=height_node(node)-height_node(node);
 	//printf("balance pour le noeud : %s\n",node->id);
 	//balance_value=balance_node(node);
 	//printf("factor avant l'appel rec %d\n",balance_value );
@@ -149,7 +149,7 @@ AVL_node* getNode_balanced(AVL_node* node){
 	}*/
 	//printf("factor %d\n",balance_value );
 	if(balance_value>=2){
-		int n=height_node(node->left->left)-height_node(node->left->right);
+		int n=height_node(node->left)-height_node(node->left);
 		if(n<=-1){
 			//printf("left to right\n");
 			node=left_To_rightRot(node);
@@ -160,7 +160,7 @@ AVL_node* getNode_balanced(AVL_node* node){
 		}
 	}
 	else if(balance_value<=-2){
-		int n=height_node(node->left->right)-height_node(node->right->right);
+		int n=height_node(node->left)-height_node(node->right);
 		if(n>=1){
 			//printf("right to left\n");
 			node=right_To_leftRot(node);
@@ -183,11 +183,10 @@ AVL_node* insertion_node(AVL_node* avl_node,Node* list_node){
 	//printf("je suis dans insertion\n");
 	if(avl_node==NULL){
 		avl_node=create_AVL_node(list_node);
-		printf("rien a faire\n");
-		return avl_node;
+		//printf("rien a faire\n");
 	}
 	else if(strcmp(avl_node->id,list_node->id)>0){
-		avl_node=insertion_node(avl_node->left,list_node);
+		avl_node->left=insertion_node(avl_node->left,list_node);
 		int balance=0;
 		balance=height_node(avl_node->left)-height_node(avl_node->right);
 		if(balance>=2 || balance<-1){
@@ -196,7 +195,7 @@ AVL_node* insertion_node(AVL_node* avl_node,Node* list_node){
 		
 	}
 	else if(strcmp(avl_node->id,list_node->id)<0){
-		avl_node=insertion_node(avl_node->right,list_node);
+		avl_node->right=insertion_node(avl_node->right,list_node);
 		int balance=0;
 		balance=height_node(avl_node->left)-height_node(avl_node->right);
 		if(balance>=2 || balance<-1){
