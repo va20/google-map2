@@ -42,7 +42,9 @@ AVL_node* getNode_balanced(AVL_node*);
 
 AVL_node* insertion_node(AVL_node*,Node*);
 
-AVL_node* search_node(char*);
+AVL_node* search_node(AVL_node*,char*);
+
+void print_spc(int);
 
 void affiche(AVL_node*);
 
