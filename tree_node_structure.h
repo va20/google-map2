@@ -40,7 +40,7 @@ AVL_node* right_To_leftRot(AVL_node*);
 
 AVL_node* getNode_balanced(AVL_node*);
 
-void insertion_node(AVL_tree_node*,Node*);
+AVL_node* insertion_node(AVL_node*,Node*);
 
 AVL_node* search_node(char*);
 

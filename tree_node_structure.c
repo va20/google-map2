@@ -19,6 +19,7 @@ AVL_node* create_AVL_node(Node* node){
 		printf("allocation memoire avl_node a echoue\n");
 		return NULL;
 	}
+	avl_node->hauteur=0;
 	avl_node->left=NULL;
 	avl_node->right=NULL;
 	avl_node->node_tag=node->node_tag;
@@ -36,57 +37,40 @@ int max_node(int a,int b){
 }
 
 int height_node(AVL_node* avl_tree_node){
-	int left_height=0;
-	int right_height=0;
-	if (avl_tree_node->left!=NULL)
-	{
-		left_height=1+height_node(avl_tree_node->left);
+	if(avl_tree_node!=NULL){
+		return avl_tree_node->hauteur;
 	}
-	if (avl_tree_node->right!=NULL)
-	{
-		right_height=1+height_node(avl_tree_node->right);
-	}
-	//printf(" hauteur left %d\n",left_height );
-	//printf("hauteur right %d\n",right_height );
-	return max_node(left_height,right_height);
-}
-
-int balance_node(AVL_node* avl_tree_node){
-	int left_height=0;
-	int right_height=0;
-	if (avl_tree_node->left!=NULL)
-	{
-		left_height=1+height_node(avl_tree_node->left);
-	}
-	if (avl_tree_node->right!=NULL)
-	{
-		right_height=1+height_node(avl_tree_node->right);
-	}
-	//printf("left height in balance : %d\n",left_height );
-	//printf("right height in balance : %d\n",right_height );
-	return left_height-right_height;
+	return -1;
 }
 
 //Rotation gauche
 AVL_node* left_To_leftRot(AVL_node* node){
 	AVL_node* tmp1=NULL;
 	AVL_node* tmp2=NULL;
+	
 	tmp1=node;
 	tmp2=tmp1->left;
+	
 	tmp1->left=tmp2->right;
 	tmp2->right=tmp1;
-	//printf("dans left to left \n");
-	//affiche(tmp2);
+	
+	tmp2->hauteur=max_node(height_node(tmp2->left),height_node(tmp2->right))+1;
+	tmp1->hauteur=max_node(height_node(tmp1->left),height_node(tmp1->right))+1;
 	return tmp2;
 }
 
 AVL_node* right_To_rightRot(AVL_node* node){
 	AVL_node* tmp1=NULL;
 	AVL_node* tmp2=NULL;
+	
 	tmp1=node;
 	tmp2=node->right;
+
 	tmp1->right=tmp2->left;
 	tmp2->left=tmp1;
+	
+	tmp2->hauteur=max_node(height_node(tmp2->left),height_node(tmp2->right))+1;
+	tmp1->hauteur=max_node(height_node(tmp1->left),height_node(tmp1->right))+1;
 	return tmp2;
 
 }
@@ -100,13 +84,19 @@ AVL_node* left_To_rightRot(AVL_node* node){
 	AVL_node* tmp1=NULL;
 	AVL_node* tmp2=NULL;
 	AVL_node* tmp3=NULL;
+	
 	tmp1=node;
 	tmp2=node->left;
 	tmp3=tmp2->right;
+
 	tmp1->left=tmp3->right;
 	tmp2->right=tmp3->left;
 	tmp3->left=tmp2;
 	tmp3->right=tmp1;
+
+	tmp3->hauteur=max_node(height_node(tmp3->left),height_node(tmp3->right))+1;
+	tmp2->hauteur=max_node(height_node(tmp2->left),height_node(tmp2->right))+1;
+	tmp1->hauteur=max_node(height_node(tmp1->left),height_node(tmp1->right))+1;
 	return tmp3;
 }
 
@@ -120,13 +110,20 @@ AVL_node* right_To_leftRot(AVL_node* node){
 	AVL_node* tmp1=NULL;
 	AVL_node* tmp2=NULL;
 	AVL_node* tmp3=NULL;
+	
 	tmp1=node;
 	tmp2=node->right;
 	tmp3=tmp2->left;
+	
 	tmp1->right=tmp3->left;
 	tmp2->left=tmp3->right;
 	tmp3->left=tmp1;
 	tmp3->right=tmp2;
+	
+	tmp3->hauteur=max_node(height_node(tmp3->left),height_node(tmp3->right))+1;
+	tmp2->hauteur=max_node(height_node(tmp2->left),height_node(tmp2->right))+1;
+	tmp1->hauteur=max_node(height_node(tmp1->left),height_node(tmp1->right))+1;
+
 	return tmp3;
 	
 }
@@ -140,8 +137,9 @@ AVL_node* getNode_balanced(AVL_node* node){
 		return node;*/
 	//AVL_node* new_node=NULL;
 	int balance_value=0;
+	balance_value=height_node(node->left)-height_node(node->right);
 	//printf("balance pour le noeud : %s\n",node->id);
-	balance_value=balance_node(node);
+	//balance_value=balance_node(node);
 	//printf("factor avant l'appel rec %d\n",balance_value );
 	/*if(node->left!=NULL){
 		node->left=getNode_balanced(node->left);
@@ -151,7 +149,7 @@ AVL_node* getNode_balanced(AVL_node* node){
 	}*/
 	//printf("factor %d\n",balance_value );
 	if(balance_value>=2){
-		int n=balance_node(node->left);
+		int n=height_node(node->left->left)-height_node(node->left->right);
 		if(n<=-1){
 			//printf("left to right\n");
 			node=left_To_rightRot(node);
@@ -162,7 +160,7 @@ AVL_node* getNode_balanced(AVL_node* node){
 		}
 	}
 	else if(balance_value<=-2){
-		int n=balance_node(node->right);
+		int n=height_node(node->left->right)-height_node(node->right->right);
 		if(n>=1){
 			//printf("right to left\n");
 			node=right_To_leftRot(node);
@@ -174,59 +172,39 @@ AVL_node* getNode_balanced(AVL_node* node){
 	}
 	return node;
 }
-void getTree_belanced(AVL_tree_node* tree){
+/*void getTree_belanced(AVL_tree_node* tree){
 	AVL_node* tmp=NULL;
 	tmp=getNode_balanced(tree->root);
 	if(tree->root!=tmp){
 		tree->root=tmp;
 	}
-}
-void insertion_node(AVL_tree_node* avl_tree_node,Node* list_node){
+}*/
+AVL_node* insertion_node(AVL_node* avl_node,Node* list_node){
 	//printf("je suis dans insertion\n");
-	AVL_node* tmp=NULL;
-	if(avl_tree_node->root==NULL){
-		avl_tree_node->root=create_AVL_node(list_node);
+	if(avl_node==NULL){
+		avl_node=create_AVL_node(list_node);
 		printf("rien a faire\n");
-		return;
+		return avl_node;
 	}
-	else{
-		tmp=avl_tree_node->root;
-		//printf("dans else\n");
-		while(tmp!=NULL && strcmp(tmp->id,list_node->id)!=0){
-			//printf("dans while\n");
-			//printf("%s\n",tmp->id );
-			//printf("list node %s\n",list_node->id );
-			if(strcmp(tmp->id,list_node->id)>0){
-				//printf("dans if while\n");
-				if(tmp->left!=NULL){
-					//printf("dans if 2 while\n");
-					tmp=tmp->left;
-				}
-				else{
-					tmp->left=create_AVL_node(list_node);
-					//printf("avant equilibrage\n");
-					//affiche(avl_tree_node->root);
-					//avl_tree_node->root=getNode_balanced(avl_tree_node->root);
-					//printf("apres equilibrage\n");
-					//affiche(avl_tree_node->root);
-				}
-			}
-			else if(strcmp(tmp->id,list_node->id)<0){
-				//printf("dans else if while\n");
-				if(tmp->right!=NULL){
-					//printf("dans if 2 else if \n");
-					tmp=tmp->right;
-				}
-				else{
-					//printf("avant equilibre droit\n");
-					tmp->right=create_AVL_node(list_node);
-					//avl_tree_node->root=getNode_balanced(avl_tree_node->root);
-					//printf("apres equilibre droit\n");
-				}
-			}
+	else if(strcmp(avl_node->id,list_node->id)>0){
+		avl_node=insertion_node(avl_node->left,list_node);
+		int balance=0;
+		balance=height_node(avl_node->left)-height_node(avl_node->right);
+		if(balance>=2 || balance<-1){
+			avl_node=getNode_balanced(avl_node);
+		}
+		
+	}
+	else if(strcmp(avl_node->id,list_node->id)<0){
+		avl_node=insertion_node(avl_node->right,list_node);
+		int balance=0;
+		balance=height_node(avl_node->left)-height_node(avl_node->right);
+		if(balance>=2 || balance<-1){
+			avl_node=getNode_balanced(avl_node);
 		}
 	}
-	getTree_belanced(avl_tree_node);
+	avl_node->hauteur=max_node(height_node(avl_node->left),height_node(avl_node->right))+1;
+	return avl_node;
 }
 AVL_node* search(AVL_node* avl_node,char* ref){
 	AVL_node* tmp=NULL;

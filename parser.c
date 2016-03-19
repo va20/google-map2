@@ -10,9 +10,8 @@ unite.c implementation
 
 int main(int argc,char *argv[]){
 	
-	AVL_tree_node tree;
-	tree.root=NULL;
-	tree=*init_tree_node();
+	AVL_tree_node* tree=NULL;
+	tree=init_tree_node();
 	
 
 
@@ -42,16 +41,16 @@ int main(int argc,char *argv[]){
 	xml_nodePtr=Root_Retrieve(xmlFile);
 	Tree_Retrieve(xml_nodePtr,&all);
 	
-	insertion_node(&tree,all.Array_Node);
+	tree->root=insertion_node(tree->root,all.Array_Node);
 	printf("affichage main\n");
-	printf("%s\n",tree.root->id );
-	printf("%p\n",tree.root->left);
+	printf("%s\n",tree->root->id );
+	printf("%p\n",tree->root->left);
 	all.Array_Node=all.Array_Node->suivant;
-	insertion_node(&tree,all.Array_Node);
+	tree->root=insertion_node(tree->root,all.Array_Node);
 	all.Array_Node=all.Array_Node->suivant;
-	insertion_node(&tree,all.Array_Node);
+	tree->root=insertion_node(tree->root,all.Array_Node);
 	printf("affichage main\n");
-	affiche(tree.root);
+	affiche(tree->root);
 	/*all.Array_Node=all.Array_Node->suivant;
 	insertion_node(&tree,all.Array_Node);
 	printf("affichage main\n");
