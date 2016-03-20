@@ -39,7 +39,7 @@ AVL_way* right_To_leftRot_way(AVL_way*);
 
 AVL_way* getway_balanced(AVL_way*);
 
-AVL_way* insertion_way_way(AVL_way*,Way*);
+AVL_way* insertion_way(AVL_way*,Way*);
 
 AVL_way* search_way(AVL_way*,char*);
 

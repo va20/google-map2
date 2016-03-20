@@ -1,25 +1,5 @@
 #include "function_parser.h"
 
-
-typedef struct AVL_tree_node AVL_tree_node;
-
-typedef struct AVL_node AVL_node;
-
-struct AVL_node{
-	AVL_node* left;
-	AVL_node* right;
-	Tag* node_tag;
-	int hauteur;
-	char* id;
-	char *visible;
-	char *lon;
-	char *lat;
-};
-
-struct AVL_tree_node{
-	AVL_node* root;
-};
-
 AVL_tree_node* init_tree_node();
 
 AVL_node* create_AVL_node(Node*);

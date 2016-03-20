@@ -10,18 +10,18 @@ unite.c implementation
 
 int main(int argc,char *argv[]){
 	
-	AVL_node* tree=NULL;
-	
+	//AVL_node* tree_node=NULL;
+	//AVL_way* tree_way=NULL;
 
 
-	/*int cmpNode,cmpTag;
-	cmpNode=0;cmpTag=0;
+	//int cmpNode=0;
+	//int cmpTag=0;
 	int cmpTag_way=0;
 	int cmp_way=0;
 	int cmpNd=0;
-	int cmp_Relation=0;
-	int cmp_member=0;
-	int cmp_member_tag=0;*/
+	//int cmp_Relation=0;
+	//int cmp_member=0;
+	//int cmp_member_tag=0;
 	if(argc >2){
 		fprintf(stderr, "erreur nombre d'arguments\n");
 		return -1;
@@ -40,34 +40,70 @@ int main(int argc,char *argv[]){
 	xml_nodePtr=Root_Retrieve(xmlFile);
 	Tree_Retrieve(xml_nodePtr,&all);
 	
-	/*tree=insertion_node(tree,all.Array_Node);
+	/*tree_node=insertion_node(tree_node,all.Array_Node);
 	printf("affichage main\n");
-	printf("%s\n",tree->id );
-	printf("%p\n",tree->left);
+	printf("%s\n",tree_node->id );
+	printf("%p\n",tree_node->left);
 	all.Array_Node=all.Array_Node->suivant;
-	tree=insertion_node(tree,all.Array_Node);
+	tree_node=insertion_node(tree_node,all.Array_Node);
 	all.Array_Node=all.Array_Node->suivant;
-	tree=insertion_node(tree,all.Array_Node);
+	tree_node=insertion_node(tree_node,all.Array_Node);
 	printf("affichage main\n");
-	affiche(tree);
+	affiche(tree_node);
 	all.Array_Node=all.Array_Node->suivant;
-	tree=insertion_node(tree,all.Array_Node);
+	tree_node=insertion_node(tree_node,all.Array_Node);
 	printf("affichage main\n");
-	affiche(tree);
+	affiche(tree_node);
 	all.Array_Node=all.Array_Node->suivant;
-	tree=insertion_node(tree,all.Array_Node);
+	tree_node=insertion_node(tree_node,all.Array_Node);
 	printf("affichage main\n");
-	affiche(tree);
+	affiche(tree_node);
 	all.Array_Node=all.Array_Node->suivant;
-	tree=insertion_node(tree,all.Array_Node);
+	tree_node=insertion_node(tree_node,all.Array_Node);
 	printf("affichage main\n");
-	affiche(tree);
+	affiche(tree_node);
 	all.Array_Node=all.Array_Node->suivant;
-	tree=insertion_node(tree,all.Array_Node);
+	tree_node=insertion_node(tree_node,all.Array_Node);
 	printf("affichage main\n");
-	affiche(tree);*/
-
-	while(all.Array_Node!=NULL){
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);
+	all.Array_Node=all.Array_Node->suivant;
+	tree_node=insertion_node(tree_node,all.Array_Node);
+	printf("affichage main\n");
+	affiche(tree_node);*/
+	
+	//while(all.Array_Node!=NULL){
 		/*if(all.Array_Node->node_tag!=NULL){
 			Tag* tmp=NULL;
 			tmp=all.Array_Node->node_tag;
@@ -80,11 +116,11 @@ int main(int argc,char *argv[]){
 		}
 		cmpNode++;*/
 		
-		tree=insertion_node(tree,all.Array_Node);
-		all.Array_Node=all.Array_Node->suivant;
-	}
+		//tree_node=insertion_node(tree_node,all.Array_Node);
+		//all.Array_Node=all.Array_Node->suivant;
+	//}
 	while(all.Array_Way!=NULL){
-		/*if(all.Array_Way->way_tag!=NULL){
+		if(all.Array_Way->way_tag!=NULL){
 			Tag* tmp=NULL;
 			tmp=all.Array_Way->way_tag;
 			Nd* tmp2=NULL;
@@ -94,11 +130,13 @@ int main(int argc,char *argv[]){
 				tmp=tmp->suivant;
 			}
 			while(tmp2!=NULL){
+				printf("node ref %s\n",tmp2->value_ref->id);
 				cmpNd++;
 				tmp2=tmp2->next_nd;
 			}
 		}
-		cmp_way++;*/
+		cmp_way++;
+		//tree_way=insertion_way(tree_way,all.Array_Way);
 		all.Array_Way=all.Array_Way->next_way;
 	}
 	/*while(all.Array_Relation!=NULL){
@@ -108,7 +146,7 @@ int main(int argc,char *argv[]){
 			tmp=all.Array_Relation->member_fils;
 			tmp2=all.Array_Relation->tag_fils;
 			while(tmp!=NULL){
-				cmp_member++;
+				cmp_member++;	
 				tmp=tmp->next_member;
 			}
 			while(tmp2!=NULL){

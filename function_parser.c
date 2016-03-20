@@ -1,5 +1,8 @@
-#include "function_parser.h"
+#include "tree_node_structure.h"
+#include "tree_way_structure.h"
 
+static AVL_node* tree_node=NULL;
+//static AVL_way* tree_way=NULL;
 
 xmlDocPtr Document_Parser(char *file){
 	xmlDocPtr xmlFile;
@@ -92,6 +95,17 @@ Way* Tag_add_Way(xmlNodePtr tag_To_add,Way* way){
 
 }
 
+void get_AVL_TreeNode(Node* node_list){
+	while(node_list!=NULL){
+		tree_node=insertion_node(tree_node,node_list);
+		printf("node insere %s\n",node_list->id );
+		node_list=node_list->suivant;
+	}
+	printf("tree node\n");
+	affiche(tree_node);
+}
+
+
 Nd* Nd_Retrieve(xmlNodePtr xml_nd){
 	static int nb_nd=0;
 	Nd* nd=NULL;
@@ -99,12 +113,14 @@ Nd* Nd_Retrieve(xmlNodePtr xml_nd){
 	char* ref_node=(char *)xmlGetProp(xml_nd,(const xmlChar *)"ref");
 	nd->ref=ref_node; 
 	nd->next_nd=NULL;
+	//printf("node trouve %s\n",search_node(tree_node,nd->ref)->id);
+	nd->value_ref=search_node(tree_node,nd->ref);
 	nb_nd++;
 	//printf("nd %d\n",nb_nd );
 	return nd;
 }
 
-Way* Nd_add_Way(xmlNodePtr nd_To_add,Way* way){
+Way* Nd_add_Way(xmlNodePtr nd_To_add,Way* way){	
 	Nd* nd=NULL;
 	if(way->ref==NULL){
 		nd=Nd_Retrieve(nd_To_add);
@@ -276,6 +292,7 @@ void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 			nombre_node++;
 		}
 		if((!xmlStrcmp(nodePtr->name,(const xmlChar *)"way"))){
+			get_AVL_TreeNode(tab->Array_Node);
 			tab=Way_add(nodePtr,tab);
 			nombre_way++;
 

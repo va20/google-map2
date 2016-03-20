@@ -1,3 +1,5 @@
+#ifndef FUNCTION_PARSER
+#define FUNCTION_PARSER 
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 #include <libxml/xmlstring.h>
@@ -14,7 +16,8 @@ typedef struct Bounds Bounds;
 typedef struct Relation Relation;
 typedef struct Member Member;
 typedef struct Array_All Array_All;
-
+typedef struct AVL_tree_node AVL_tree_node;
+typedef struct AVL_node AVL_node;
 
 struct Bounds{
 	char *minlat;
@@ -29,8 +32,21 @@ struct Tag{
 	Tag* suivant;
 };
 
+struct AVL_node{
+	AVL_node* left;
+	AVL_node* right;
+	Tag* node_tag;
+	int hauteur;
+	char* id;
+	char *visible;
+	char *lon;
+	char *lat;
+};
+
+
 struct Nd{
 	char* ref;
+	AVL_node* value_ref;
 	Nd* next_nd;
 };
 
@@ -75,3 +91,8 @@ struct Relation{
 	Tag* tag_fils;
 	Relation* next_relation;
 };
+
+struct AVL_tree_node{
+	AVL_node* root;
+};
+#endif
