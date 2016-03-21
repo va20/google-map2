@@ -18,6 +18,8 @@ typedef struct Member Member;
 typedef struct Array_All Array_All;
 typedef struct AVL_tree_node AVL_tree_node;
 typedef struct AVL_node AVL_node;
+typedef struct AVL_tree_way AVL_tree_way;
+typedef struct AVL_way AVL_way;
 
 struct Bounds{
 	char *minlat;
@@ -68,6 +70,21 @@ struct Way{
 	Nd* ref;
 	Tag* way_tag;
 	Way* next_way;
+};
+
+
+struct AVL_way{
+	AVL_way* left;
+	AVL_way* right;
+	Tag* way_tag;
+	int hauteur;
+	char* id;
+	char *visible;
+	Nd* ref;
+};
+
+struct AVL_tree_way{
+	AVL_way* root;
 };
 
 struct Array_All{

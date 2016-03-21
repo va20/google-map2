@@ -1,5 +1,6 @@
-#include "tree_node_structure.h"
-#include "tree_way_structure.h"
+
+#include "graphic.h"
+
 
 xmlDocPtr Document_Parser(char*);
 

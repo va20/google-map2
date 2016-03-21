@@ -140,13 +140,13 @@ AVL_node* getNode_balanced(AVL_node* node){
 		if (node->left->right!=NULL && node->left->left == NULL){
 			n=0-height_node(node->left->right);
 			if(n<=-1){
-			printf("left to right\n");
+			//printf("left to right\n");
 			node=left_To_rightRot(node);
 		}
 	}
 		
 		else{
-			printf("left to left\n");
+			//printf("left to left\n");
 			node=left_To_leftRot(node);
 		}
 	}
@@ -155,12 +155,12 @@ AVL_node* getNode_balanced(AVL_node* node){
 		if (node->right->left!=NULL && node->right->right==NULL){
 			n=height_node(node->right->left)-0;
 			if(n>=1){
-				printf("right to left\n");
+				//printf("right to left\n");
 				node=right_To_leftRot(node);
 			}
 		}
 		else{
-			printf("right to right\n");
+			//printf("right to right\n");
 			node=right_To_rightRot(node);
 		}
 	}

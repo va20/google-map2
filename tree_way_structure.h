@@ -1,24 +1,5 @@
 #include "function_parser.h"
 
-
-typedef struct AVL_tree_way AVL_tree_way;
-
-typedef struct AVL_way AVL_way;
-
-struct AVL_way{
-	AVL_way* left;
-	AVL_way* right;
-	Tag* way_tag;
-	int hauteur;
-	char* id;
-	char *visible;
-	Nd* ref;
-};
-
-struct AVL_tree_way{
-	AVL_way* root;
-};
-
 AVL_tree_way* init_tree_way();
 
 AVL_way* create_AVL_way(Way*);

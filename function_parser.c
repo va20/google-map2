@@ -98,11 +98,11 @@ Way* Tag_add_Way(xmlNodePtr tag_To_add,Way* way){
 void get_AVL_TreeNode(Node* node_list){
 	while(node_list!=NULL){
 		tree_node=insertion_node(tree_node,node_list);
-		printf("node insere %s\n",node_list->id );
+		//printf("node insere %s\n",node_list->id );
 		node_list=node_list->suivant;
 	}
-	printf("tree node\n");
-	affiche(tree_node);
+	//printf("tree node\n");
+	//affiche(tree_node);
 }
 
 
