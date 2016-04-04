@@ -40,20 +40,22 @@ int main(int argc,char *argv[]){
     lon_mx=strtod(all.Array_Bounds->maxlon,NULL);
     lon_m=strtod(all.Array_Bounds->minlon,NULL);
     double x,y;
-    x=y=0;
-    x=lon_mx-lon_m;
-    y=lat_mx-lat_m;
     int height;
-
+    double x_lat_max = (lon_mx - lon_m) * cos (lat_mx * 3.14 / 180);
+    double x_lat_min = (lon_mx - lon_m) * cos (lat_m  * 3.14 / 180);
+    x = (x_lat_max > x_lat_min) ? x_lat_max : x_lat_min;
+    y = lat_mx - lat_m;
     if(x>y){
+        //width=1200;
         height=(y*1200)/x;
     }
     else{
         height=1200;
+        //width=(x*1200)/y;
 
     }
     //double k=(800*360)/((lat_mx-lat_m);
-    double k2=(height*360)/((lon_mx-lon_m)*cos(lat_mx));
+    double k2=(height*360)/y;
 	SDL_Renderer* map=SDL_GetRenderer(fenetre);
     SDL_SetRenderDrawColor(map, 200, 200, 200, 255);
     SDL_RenderClear(map);
@@ -80,12 +82,13 @@ int main(int argc,char *argv[]){
         }*/
         while(all.Array_Way!=NULL){
         	double x_pred,y_pred,x_cour,y_cour;
+        	//initialisation pour le premier point
         	x_pred=y_pred=x_cour=y_cour=100000;
         	Nd* tmp=all.Array_Way->ref;
         	while(tmp!=NULL){
         		x_cour=strtod(tmp->value_ref->lon,NULL);
         		y_cour=strtod(tmp->value_ref->lat,NULL);
-        		x_cour=((x_cour-lon_m)*k2*cos(y_cour))/360;
+        		x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
     			y_cour=((y_cour-lat_m)*k2)/360;
         		if(x_pred==100000){
         			x_pred=x_cour;
@@ -93,8 +96,8 @@ int main(int argc,char *argv[]){
         		}
         		else{
         			SDL_SetRenderDrawColor(map,0,0,0,255);
-        			SDL_RenderDrawLine(map,(int)y_pred,(int)x_pred,(int)y_cour,(int)x_cour);
-        			SDL_RenderPresent(map);
+        			SDL_RenderDrawLine(map,(int)x_cour,height-(int)y_cour,(int)x_pred,height-(int)y_pred);
+        			
         			x_pred=x_cour;
         			y_pred=y_cour;
         		}
@@ -102,6 +105,7 @@ int main(int argc,char *argv[]){
         	}
         	all.Array_Way=all.Array_Way->next_way;
         }
+        SDL_RenderPresent(map);
         SDL_PollEvent(&event);
         switch(event.type){
         case SDL_QUIT:

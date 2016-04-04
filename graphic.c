@@ -10,6 +10,21 @@ SDL_Window* Create_Window(char* lat_max,char* lat_min,char* lon_max,char* lon_mi
     lon_m=strtod(lon_min,NULL);
     double x,y;
     int height,width;
+
+    double x_lat_max = (lon_mx - lon_m) * cos (lat_mx * 3.14 / 180);
+    double x_lat_min = (lon_mx - lon_m) * cos (lat_m  * 3.14 / 180);
+    x = (x_lat_max > x_lat_min) ? x_lat_max : x_lat_min;
+    y = lat_mx - lat_m;
+    if(x>y){
+        width=1200;
+        height=(y*1200)/x;
+    }
+    else{
+        height=1200;
+        width=(x*1200)/y;
+
+    }
+/*
     x=lon_mx-lon_m;
     y=lat_mx-lat_m;
     if(x>y){
@@ -21,7 +36,7 @@ SDL_Window* Create_Window(char* lat_max,char* lat_min,char* lon_max,char* lon_mi
         width=(x*1200)/y;
 
     }
-
+*/
     /*printf("lat max %f\n",lat_mx );
     printf("lat m %f\n",lat_m );
     printf("lon max %f\n",lon_mx );
@@ -34,7 +49,7 @@ SDL_Window* Create_Window(char* lat_max,char* lat_min,char* lon_max,char* lon_mi
         return NULL;
     }
     fenetre=SDL_CreateWindow("Google_Map_2",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,
-        width,height,0);
+        width,height,SDL_WINDOW_RESIZABLE);
     if(fenetre==NULL){
         printf("Erreur fenetre %s\n",SDL_GetError());
         return NULL;
