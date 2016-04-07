@@ -7,7 +7,7 @@ unite.h def de types+prototypes utiliser par d'autre unité
 unite.c implementation
 
 
- */
+ */	
 
 int main(int argc,char *argv[]){
 
@@ -124,6 +124,9 @@ int main(int argc,char *argv[]){
 	int cmpTag_way=0;
 	int cmp_way=0;
 	int cmpNd=0;
+	//short* p1,p2,p3,p4;
+	int a=lineRGBA(map,10,10,50,50,255,255,255,0);
+	printf("%d\n",a );
 	//int cmp_Relation=0;
 	//int cmp_member=0;
 	//int cmp_member_tag=0;	

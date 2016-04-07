@@ -1,6 +1,7 @@
 #ifndef GRAPHIQUE
 #define GRAPHIQUE
 #include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 #include "tree_node_structure.h"
 #include "tree_way_structure.h"
 
