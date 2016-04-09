@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS= -g -Wall -Werror 
 CPPFLAGS= `xml2-config --cflags`
 LDFLAGS= `xml2-config --libs`
-SDLFLAG= `sdl2-config --cflags --libs -lSDL2_gfx -lSDL2` 
+SDLFLAG= `sdl2-config --cflags --libs` -lSDL2_gfx
 
 
 TARGET=street_map
@@ -12,8 +12,11 @@ OBJ=$(SRC:.c=.o)
 
 
 
-all:$(OBJ)
-	$(CC) -o $@ $^ $(CPPFLAGS) $(LDFLAGS) $(SDLFLAG)
+all:$(TARGET)
+
+
+street_map:$(OBJ)
+	$(CC) -o $@ $^ $(CPPFLAGS) $(LDFLAGS) -lm $(SDLFLAG)
 
 %.o: %.c %.h
-	$(CC) $(SRC) -o $(TARGET) $(CPPFLAGS) $(LDFLAGS) $(CFLAGS) $(SDLFLAG)
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(CPPFLAGS) $(LDFLAGS) -lm $(SDLFLAG) 

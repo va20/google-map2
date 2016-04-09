@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "SDL2/SDL2_gfxPrimitives.h"
 /*
 unite.h def de types+prototypes utiliser par d'autre unité
 unite.c implementation
@@ -14,13 +15,16 @@ int main(int argc,char *argv[]){
 	if(argc >2){
 		fprintf(stderr, "erreur nombre d'arguments\n");
 		return -1;
-	}	
+	}
 	Array_All all;
 	all.Array_Bounds=NULL;
 	all.Array_Node=NULL;
 	all.Array_Way=NULL;
 	all.Array_Relation=NULL;
 
+	//variables pour stocker les (lat_max,lon_max,lat_min,lon_min)
+	double lat_mx,lat_m,lon_mx,lon_m;
+    lat_mx=lat_m=lon_mx=lon_m=0;
 	
 	xmlDocPtr xmlFile=NULL;
 	xmlNodePtr xml_nodePtr=NULL;
@@ -33,15 +37,15 @@ int main(int argc,char *argv[]){
 	SDL_Window* fenetre=Create_Window(all.Array_Bounds->maxlat,all.Array_Bounds->minlat,
 		all.Array_Bounds->maxlon,all.Array_Bounds->minlon);
 
-	double lat_mx,lat_m,lon_mx,lon_m;
-    lat_mx=lat_m=lon_mx=lon_m=0;
     lat_mx=strtod(all.Array_Bounds->maxlat,NULL);
     lat_m=strtod(all.Array_Bounds->minlat,NULL);
     lon_mx=strtod(all.Array_Bounds->maxlon,NULL);
     lon_m=strtod(all.Array_Bounds->minlon,NULL);
     double x,y;
-    int height;
+    x=y=0;
+    int height=0;
     double x_lat_max = (lon_mx - lon_m) * cos (lat_mx * 3.14 / 180);
+
     double x_lat_min = (lon_mx - lon_m) * cos (lat_m  * 3.14 / 180);
     x = (x_lat_max > x_lat_min) ? x_lat_max : x_lat_min;
     y = lat_mx - lat_m;
@@ -64,46 +68,111 @@ int main(int argc,char *argv[]){
     //Boucle qui tiens la fenêtre ouverte.
     SDL_Event event;
     int repeat = 0;
+    int building=0;
+    int highway=0;
+    int natural=0;
     while(!repeat){
-        /*while(all.Array_Node!=NULL){
-        	SDL_SetRenderDrawColor(map,30,30,30,255);
-        	double lon_x=strtod(all.Array_Node->lon,NULL);
-    		double lat_y=strtod(all.Array_Node->lat,NULL);
-    		int x,y;
-    		x=y=0;
-    		x=((lon_x-lon_m)*k2)/360;
-    		y=((lat_y-lat_m)*k2*cos(lat_y))/360;
-    		printf("lon %d\n",x);
-    		printf("lat %d\n",y);
-
-        	SDL_RenderDrawPoint(map,(int)x,(int)y);
-        	SDL_RenderPresent(map);
-        	all.Array_Node=all.Array_Node->suivant;
-        }*/
-        while(all.Array_Way!=NULL){
-        	double x_pred,y_pred,x_cour,y_cour;
+        while(all.Array_Way != NULL){
+        	double x_cour,y_cour;
+        	
         	//initialisation pour le premier point
-        	x_pred=y_pred=x_cour=y_cour=100000;
+        	
         	Nd* tmp=all.Array_Way->ref;
+        	//printf("avant if \n");
+        	//printf("%s\n",all.Array_Way->way_tag->key);
+        	int i=0;
+        	Sint16 *tabPoly_X=NULL;
+        	Sint16 *tabPoly_Y=NULL;
+        	tabPoly_X=malloc((all.Array_Way->nb_ref)*sizeof(Sint16));
+        	tabPoly_Y=malloc((all.Array_Way->nb_ref)*sizeof(Sint16));
+        	if(isBuilding(all.Array_Way->way_tag,"building")){
+        		building=1;	
+        	}
+        	if(isBuilding(all.Array_Way->way_tag,"highway")){
+        		highway=1;
+        	}
+        	if(isBuilding(all.Array_Way->way_tag,"natural")){
+        		natural=1;
+        	}
+        	
         	while(tmp!=NULL){
         		x_cour=strtod(tmp->value_ref->lon,NULL);
         		y_cour=strtod(tmp->value_ref->lat,NULL);
         		x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
     			y_cour=((y_cour-lat_m)*k2)/360;
-        		if(x_pred==100000){
-        			x_pred=x_cour;
-        			y_pred=y_cour;
-        		}
-        		else{
-        			SDL_SetRenderDrawColor(map,0,0,0,255);
-        			SDL_RenderDrawLine(map,(int)x_cour,height-(int)y_cour,(int)x_pred,height-(int)y_pred);
-        			
-        			x_pred=x_cour;
-        			y_pred=y_cour;
-        		}
+        		tabPoly_X[i]=(Sint16) x_cour;
+        		tabPoly_Y[i]=(Sint16) (height - y_cour);
+        		i++;
         		tmp=tmp->next_nd;
         	}
-        	all.Array_Way=all.Array_Way->next_way;
+       		if(highway){
+       			int tmp = i-1;
+
+       			while(tmp>0){
+       				char *value=NULL;
+       				value=valueOf(all.Array_Way->way_tag,"highway");
+
+       					if(strcmp(value,"motorway")==0){
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],20,255,102,102);
+       					}
+       					else if(strcmp(value,"trunk")==0){
+       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],20,255,153,51);
+       					}
+       					else if(strcmp(value,"primary")==0){
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],20,255,178,102,255);
+       					}
+       					else if(strcmp(value,"secondary")==0){
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],20,229,255,204,255);
+       					}
+       					else if(strcmp(value,"tertiary")==0){
+       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],20,0xFFFFFFFF);
+       					}
+       					else if(strcmp(value,"unclassified")==0){
+       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],10,0xFFFFFFFF);
+       					}
+       					else if(strcmp(value,"residential")==0){
+       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],10,0xFFFFFFFF);
+       					}
+       					else if(strcmp(value,"service")==0){
+       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],5,0xFFFFFFFF);
+       					}
+       					else if(strcmp(value,"pedestrian")==0){
+       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],5,0xFFFFFFFF);
+       					}
+       					else{
+       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],5,0xFFFFFFFF);	
+       					}
+       					tmp--;
+       						
+       				}
+       				
+       				
+       				//printf("je suis la\n");
+       			
+       			highway=0;
+       		}
+       		if(building){
+       			filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 192,192,192,255);
+       			building = 0;
+       			polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+       		}
+
+
+       		
+       		free(tabPoly_X);
+       		free(tabPoly_Y);
+       		i = 0;
+        	all.Array_Way = all.Array_Way->next_way;
         }
         SDL_RenderPresent(map);
         SDL_PollEvent(&event);
@@ -114,149 +183,5 @@ int main(int argc,char *argv[]){
         }
     }
     SDL_DestroyWindow(fenetre);
-	
-	//AVL_node* tree_node=NULL;
-	//AVL_way* tree_way=NULL;
-
-
-	//int cmpNode=0;
-	//int cmpTag=0;
-	int cmpTag_way=0;
-	int cmp_way=0;
-	int cmpNd=0;
-	//short* p1,p2,p3,p4;
-	int a=lineRGBA(map,10,10,50,50,255,255,255,0);
-	printf("%d\n",a );
-	//int cmp_Relation=0;
-	//int cmp_member=0;
-	//int cmp_member_tag=0;	
-	/*tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	printf("%s\n",tree_node->id );
-	printf("%p\n",tree_node->left);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);
-	all.Array_Node=all.Array_Node->suivant;
-	tree_node=insertion_node(tree_node,all.Array_Node);
-	printf("affichage main\n");
-	affiche(tree_node);*/
-	
-	//while(all.Array_Node!=NULL){
-		/*if(all.Array_Node->node_tag!=NULL){
-			Tag* tmp=NULL;
-			tmp=all.Array_Node->node_tag;
-			while(tmp!=NULL){
-				cmpTag++;
-				//printf("tag name : %s\n",tmp->key );
-				//printf("tag val : %s\n",tmp->value );
-				tmp=tmp->suivant;
-			}
-		}
-		cmpNode++;*/
-		
-		//tree_node=insertion_node(tree_node,all.Array_Node);
-		//all.Array_Node=all.Array_Node->suivant;
-	//}
-	while(all.Array_Way!=NULL){
-		if(all.Array_Way->way_tag!=NULL){
-			Tag* tmp=NULL;
-			tmp=all.Array_Way->way_tag;
-			Nd* tmp2=NULL;
-			tmp2=all.Array_Way->ref;
-			while(tmp!=NULL){
-				cmpTag_way++;
-				tmp=tmp->suivant;
-			}
-			while(tmp2!=NULL){
-				//printf("node ref %s\n",tmp2->value_ref->id);
-				cmpNd++;
-				tmp2=tmp2->next_nd;
-			}
-		}
-		cmp_way++;
-		//tree_way=insertion_way(tree_way,all.Array_Way);
-		all.Array_Way=all.Array_Way->next_way;
-	}
-	/*while(all.Array_Relation!=NULL){
-		if (all.Array_Relation->member_fils!=NULL){
-			Member* tmp=NULL;
-			Tag* tmp2=NULL;
-			tmp=all.Array_Relation->member_fils;
-			tmp2=all.Array_Relation->tag_fils;
-			while(tmp!=NULL){
-				cmp_member++;	
-				tmp=tmp->next_member;
-			}
-			while(tmp2!=NULL){
-				cmp_member_tag++;
-				tmp2=tmp2->suivant;
-			}
-			cmp_Relation++;
-			all.Array_Relation=all.Array_Relation->next_relation;
-
-		}
-	}*/
-	/*printf("%d\n",height_node(&node) );
-	printf("nombre de way %d\n",cmp_way );
-	printf("nombre de tag_way %d\n",cmpTag_way);
-	printf("nombre de nd dans way %d\n",cmpNd);
-	printf("nombre de nodes %d\n",cmpNode );
-	printf("nombre de tag %d\n",cmpTag);
-	printf("nombre de relation %d\n",cmp_Relation);
-	printf("nombre de member %d\n",cmp_member);
-	printf("nombre de tag dans relation %d\n",cmp_member_tag );
-	printf("c bon \n");*/
 	return 0;
 }

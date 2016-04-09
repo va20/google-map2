@@ -68,6 +68,8 @@ struct Way{
 	char *id;
 	char *visible;
 	Nd* ref;
+	int nb_ref;
+	char *way_type;
 	Tag* way_tag;
 	Way* next_way;
 };

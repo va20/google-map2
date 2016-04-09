@@ -122,6 +122,7 @@ Nd* Nd_Retrieve(xmlNodePtr xml_nd){
 
 Way* Nd_add_Way(xmlNodePtr nd_To_add,Way* way){	
 	Nd* nd=NULL;
+
 	if(way->ref==NULL){
 		nd=Nd_Retrieve(nd_To_add);
 		way->ref=nd;
@@ -183,6 +184,7 @@ Way* Way_Retrieve(xmlNodePtr xml_way){
 	way->visible=(char *)xmlGetProp(xml_way,(const xmlChar *)"visible");
 	way->next_way=NULL;
 	way->ref=NULL;
+	way->nb_ref=0;
 	way->way_tag=NULL;
 	if(xml_way->children!=NULL){
 		xml_way=xml_way->xmlChildrenNode;
@@ -191,6 +193,7 @@ Way* Way_Retrieve(xmlNodePtr xml_way){
 				way=Tag_add_Way(xml_way,way);
 			}
 			if((!xmlStrcmp(xml_way->name,(const xmlChar*)"nd"))){
+				way->nb_ref++;
 				way=Nd_add_Way(xml_way,way);
 			}
 			xml_way=xml_way->next;

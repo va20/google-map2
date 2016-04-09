@@ -61,6 +61,82 @@ SDL_Window* Create_Window(char* lat_max,char* lat_min,char* lon_max,char* lon_mi
     }
     return fenetre;
 }
+
+int Tab_size(Way* way){
+    int size=0;
+    while(way->ref!=NULL){
+        size++;
+        way->ref=way->ref->next_nd;
+    }
+    //printf("size %d\n",size);
+    return size;
+}
+
+Sint16* create_tab_poly(Way* way){
+    Sint16* tab=NULL;
+    int taille=0;
+    while(way->ref!=NULL){
+        taille++;
+        way->ref=way->ref->next_nd;
+    }
+    tab=(Sint16*)malloc(taille*sizeof(Sint16));
+    if(tab==NULL){
+        printf("ERROR CREATION TABLE POLYGON\n");
+        exit(0);
+    }
+    return tab;
+}   
+
+int isBuilding(Tag* tag,char* word){
+    int rep=0;
+    Tag* tmp=NULL;
+    tmp=tag;
+    while(tmp!=NULL){
+        //printf("%s\n",tmp->key );
+        if(strcmp(tmp->key,word)==0){
+            rep=1;
+            return rep;
+        }
+        tmp=tmp->suivant;
+    }
+    return 0;
+}
+
+char* valueOf(Tag* tag,char* word){
+    
+    Tag* tmp=NULL;
+    tmp=tag;
+
+    while(tmp!=NULL){
+        //printf("%s\n",tmp->key );
+        if(strcmp(tmp->key,word)==0){
+            
+            return tmp->value;
+        }
+        tmp=tmp->suivant;
+    }
+    return NULL;
+}
+
+void init_tab_poly(Sint16* tab_X,Sint16* tab_Y,Way* way,double k,double lon_m,
+    double lat_m,int height,int size){
+    int i=0;
+    double x_cour,y_cour;
+    x_cour=y_cour=0;
+    Nd* nd_ref=NULL;
+    nd_ref=way->ref;
+    while(nd_ref!=NULL){
+        x_cour=strtod(nd_ref->value_ref->lon,NULL);
+        y_cour=strtod(nd_ref->value_ref->lat,NULL);
+        x_cour=((x_cour-lon_m)*k*cos(y_cour*(3.14/180)))/360;
+        y_cour=((y_cour-lat_m)*k)/360;
+        tab_X[i]=(int)x_cour;
+        tab_Y[i]=(int)y_cour;
+        i++;
+        nd_ref=nd_ref->next_nd;
+    }
+}
+
 void draw_points(Node* list_node,SDL_Renderer* map){
     int lat_y,lon_x;
     lat_y=lon_x=0;
