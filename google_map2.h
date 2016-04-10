@@ -38,3 +38,7 @@ Array_All* Relation_add(xmlNodePtr,Array_All*);
 Bounds* Bounds_Retrieve(xmlNodePtr);
 
 void Hash_TableNode(Node*,size_t);
+
+void Hash_TableWay(Way*);
+
+int Relation_Role(char*);

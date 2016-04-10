@@ -12,5 +12,6 @@ void init_tab_poly(Sint16*,Sint16*,Way*,double,double,double,int,int);
 int isBuilding(Tag*,char*);
 char* valueOf(Tag*,char*);
 
+
 #endif /* GRAPHIQUE */
 

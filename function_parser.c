@@ -1,8 +1,10 @@
 #include "tree_node_structure.h"
 #include "tree_way_structure.h"
 #include <search.h>
-//static AVL_node* tree_node=NULL;
-//static AVL_way* tree_way=NULL;
+
+#define OUTER 1
+#define INNER 2
+#define OTHER 3
 
 xmlDocPtr Document_Parser(char *file){
 	xmlDocPtr xmlFile;
@@ -55,6 +57,16 @@ Tag* Tag_Retrieve(xmlNodePtr xml_node){
 	return tag;
 }
 
+int Relation_Role(char* role){
+	if(strcmp(role,"inner")==0){
+		return INNER;
+	}
+	else if(strcmp(role,"OUTER")==0){
+		return OUTER;
+	}
+	return OTHER;
+}
+
 Member* Member_Retrieve(xmlNodePtr xml_member){
 	static int cmpMem=0;
 	Member* member=NULL;
@@ -62,6 +74,33 @@ Member* Member_Retrieve(xmlNodePtr xml_member){
 	member->type=(char*)xmlGetProp(xml_member,(const xmlChar*)"type");
 	member->ref=(char*)xmlGetProp(xml_member,(const xmlChar*)"ref");
 	member->role=(char*)xmlGetProp(xml_member,(const xmlChar*)"role");
+	member->node_ref=NULL;
+	member->way_ref=NULL;
+	if(strcmp(member->type,"way")==0){
+		ENTRY tmp;
+		tmp.key=member->ref;
+		if(hsearch(tmp,FIND)==NULL){
+			//printf("REFRENCE TO WAY DOES NOT EXIST \n");
+			
+		}
+		else{
+			ENTRY* item=NULL;
+			item=hsearch(tmp,FIND);
+			member->way_ref=item->data;
+		}
+	}
+	else if(strcmp(member->type,"node")==0){
+		ENTRY tmp;
+		tmp.key=member->ref;
+		if(hsearch(tmp,FIND)==NULL){
+			//printf("REFRENCE TO NODE DOES NOT EXIST \n");
+		}
+		else{
+			ENTRY* item=NULL;
+			item=hsearch(tmp,FIND);
+			member->way_ref=item->data;
+		}
+	}
 	member->next_member=NULL;
 	cmpMem++;
 	//printf("member %d\n",cmpMem);
@@ -107,7 +146,7 @@ Way* Tag_add_Way(xmlNodePtr tag_To_add,Way* way){
 
 void hash_TableNode(Node* node, size_t size){
 	int descripter=0;
-	descripter=hcreate(size*2);
+	descripter=hcreate(size*4);
 	if(descripter==0){
 		printf("HASH TABLE CREATION FAILLED\n");
 		return;
@@ -119,13 +158,28 @@ void hash_TableNode(Node* node, size_t size){
 		ENTRY* verif=NULL;
 		verif=hsearch(item,ENTER);
 		if(verif==NULL){
-			printf("INSERTION FAILLED \n");
+			printf("INSERTION NODE FAILLED \n");
 			return;
 		}
 		node=node->suivant;
 	}
 }
 
+
+void hash_TableWay(Way* way){
+	ENTRY item;
+	while(way!=NULL){
+		item.key=way->id;
+		item.data=way;
+		ENTRY* verif=NULL;
+		verif=hsearch(item,ENTER);
+		if(verif==NULL){
+			printf("INSERTION WAY FAILLED \n");
+			return;
+		}
+		way=way->next_way;
+	}
+}
 
 Nd* Nd_Retrieve(xmlNodePtr xml_nd){
 	static int nb_nd=0;
@@ -190,7 +244,7 @@ Node* Node_Retrieve(xmlNodePtr xml_node){
 //pour ajouter les noeuds dans la liste (Array_node)
 Array_All* Node_add(xmlNodePtr node_To_add,Array_All* all){
 	Node* node=NULL;
-	all->size_list++;
+	all->size_list_node++;
 	if(all->Array_Node==NULL){
 		node=Node_Retrieve(node_To_add);
 		all->Array_Node=node;
@@ -232,6 +286,7 @@ Way* Way_Retrieve(xmlNodePtr xml_way){
 
 Array_All* Way_add(xmlNodePtr way_To_add,Array_All* all){
 	Way* way=NULL;
+	all->size_list_way++;
 	if(all->Array_Way==NULL){
 		way=Way_Retrieve(way_To_add);
 		all->Array_Way=way;
@@ -310,7 +365,8 @@ void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 	static int nombre_node=0;
 	static int nombre_way=0;
 	static int nombre_relation=0;
-	int hash=1;
+	int hash_Node=1;
+	int hash_Way=1;
 	printf("Tree : %s\n",nodePtr->name);
 	nodePtr=nodePtr->xmlChildrenNode;
 	nodePtr=nodePtr->next;
@@ -324,17 +380,20 @@ void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 			nombre_node++;
 		}
 		else if((!xmlStrcmp(nodePtr->name,(const xmlChar *)"way"))){
-			if(hash){
-				hash_TableNode(tab->Array_Node,tab->size_list);
-				hash=0;	
+			if(hash_Node){
+				hash_TableNode(tab->Array_Node,tab->size_list_node);
+				hash_Node=0;
 			}
 			tab=Way_add(nodePtr,tab);
 			nombre_way++;
-
 		}
 
 		else if ((!xmlStrcmp(nodePtr->name,(const xmlChar *)"relation")))
 		{
+			if(hash_Way){
+				hash_TableWay(tab->Array_Way);
+				hash_Way=0;
+			}
 			tab=Relation_add(nodePtr,tab);
 			nombre_relation++;
 		}
@@ -343,7 +402,7 @@ void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 		
 	}
 	
-	printf("nombre node size_list %zu\n",tab->size_list);
+	printf("nombre node size_list_node %zu\n",tab->size_list_node);
 	printf("nombre de node dans tree : %d\n",nombre_node );
 	printf("nombre de way dans tree : %d\n",nombre_way );
 	printf("nombre de relation dans tree : %d\n",nombre_relation );

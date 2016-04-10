@@ -93,8 +93,9 @@ struct AVL_tree_way{
 
 struct Array_All{
 	Node* Array_Node;
-	size_t size_list;
+	size_t size_list_node;
 	Way* Array_Way;
+	size_t size_list_way;
 	Bounds* Array_Bounds;
 	Relation* Array_Relation;
 };
@@ -103,6 +104,8 @@ struct Member{
 	char* type;
 	char* ref;
 	char* role;
+	Node* node_ref;
+	Way* way_ref;
 	Member* next_member;
 };
 
