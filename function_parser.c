@@ -1,7 +1,7 @@
 #include "tree_node_structure.h"
 #include "tree_way_structure.h"
-
-static AVL_node* tree_node=NULL;
+#include <search.h>
+//static AVL_node* tree_node=NULL;
 //static AVL_way* tree_way=NULL;
 
 xmlDocPtr Document_Parser(char *file){
@@ -95,7 +95,7 @@ Way* Tag_add_Way(xmlNodePtr tag_To_add,Way* way){
 
 }
 
-void get_AVL_TreeNode(Node* node_list){
+/*void get_AVL_TreeNode(Node* node_list){
 	while(node_list!=NULL){
 		tree_node=insertion_node(tree_node,node_list);
 		//printf("node insere %s\n",node_list->id );
@@ -103,6 +103,27 @@ void get_AVL_TreeNode(Node* node_list){
 	}
 	//printf("tree node\n");
 	//affiche(tree_node);
+}*/
+
+void hash_TableNode(Node* node, size_t size){
+	int descripter=0;
+	descripter=hcreate(size*2);
+	if(descripter==0){
+		printf("HASH TABLE CREATION FAILLED\n");
+		return;
+	}
+	ENTRY item;
+	while(node!=NULL){
+		item.key=node->id;
+		item.data=node;
+		ENTRY* verif=NULL;
+		verif=hsearch(item,ENTER);
+		if(verif==NULL){
+			printf("INSERTION FAILLED \n");
+			return;
+		}
+		node=node->suivant;
+	}
 }
 
 
@@ -113,10 +134,16 @@ Nd* Nd_Retrieve(xmlNodePtr xml_nd){
 	char* ref_node=(char *)xmlGetProp(xml_nd,(const xmlChar *)"ref");
 	nd->ref=ref_node; 
 	nd->next_nd=NULL;
-	//printf("node trouve %s\n",search_node(tree_node,nd->ref)->id);
-	nd->value_ref=search_node(tree_node,nd->ref);
+	ENTRY tmp;
+	tmp.key=nd->ref;
+	if(hsearch(tmp,FIND)==NULL){
+		printf("VALUE NOT FOUND \n");
+		return NULL;
+	}
+	ENTRY* res=NULL;
+	res=hsearch(tmp,FIND);
+	nd->value_ref=res->data;
 	nb_nd++;
-	//printf("nd %d\n",nb_nd );
 	return nd;
 }
 
@@ -163,6 +190,7 @@ Node* Node_Retrieve(xmlNodePtr xml_node){
 //pour ajouter les noeuds dans la liste (Array_node)
 Array_All* Node_add(xmlNodePtr node_To_add,Array_All* all){
 	Node* node=NULL;
+	all->size_list++;
 	if(all->Array_Node==NULL){
 		node=Node_Retrieve(node_To_add);
 		all->Array_Node=node;
@@ -282,6 +310,7 @@ void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 	static int nombre_node=0;
 	static int nombre_way=0;
 	static int nombre_relation=0;
+	int hash=1;
 	printf("Tree : %s\n",nodePtr->name);
 	nodePtr=nodePtr->xmlChildrenNode;
 	nodePtr=nodePtr->next;
@@ -290,16 +319,20 @@ void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 			tab->Array_Bounds=Bounds_Retrieve(nodePtr);
 
 		}
-		if((!xmlStrcmp(nodePtr->name,(const xmlChar *)"node"))){
+		else if((!xmlStrcmp(nodePtr->name,(const xmlChar *)"node"))){
 			tab=Node_add(nodePtr,tab);
 			nombre_node++;
 		}
-		if((!xmlStrcmp(nodePtr->name,(const xmlChar *)"way"))){
-			get_AVL_TreeNode(tab->Array_Node);
+		else if((!xmlStrcmp(nodePtr->name,(const xmlChar *)"way"))){
+			if(hash){
+				hash_TableNode(tab->Array_Node,tab->size_list);
+				hash=0;	
+			}
 			tab=Way_add(nodePtr,tab);
 			nombre_way++;
 
 		}
+
 		else if ((!xmlStrcmp(nodePtr->name,(const xmlChar *)"relation")))
 		{
 			tab=Relation_add(nodePtr,tab);
@@ -309,6 +342,8 @@ void Tree_Retrieve(xmlNodePtr nodePtr,Array_All* tab){
 		
 		
 	}
+	
+	printf("nombre node size_list %zu\n",tab->size_list);
 	printf("nombre de node dans tree : %d\n",nombre_node );
 	printf("nombre de way dans tree : %d\n",nombre_way );
 	printf("nombre de relation dans tree : %d\n",nombre_relation );

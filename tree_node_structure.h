@@ -33,3 +33,4 @@ void affiche_suffixe(AVL_node*,int);
 void affiche_indent(AVL_node*,int);
 
 void getTree_belanced(AVL_tree_node*);
+

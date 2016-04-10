@@ -19,6 +19,7 @@ int main(int argc,char *argv[]){
 	Array_All all;
 	all.Array_Bounds=NULL;
 	all.Array_Node=NULL;
+  all.size_list=0;
 	all.Array_Way=NULL;
 	all.Array_Relation=NULL;
 
@@ -70,7 +71,10 @@ int main(int argc,char *argv[]){
     int repeat = 0;
     int building=0;
     int highway=0;
+    int waterway=0;
     int natural=0;
+    int landuse=0;
+    int leisure=0;
     while(!repeat){
         while(all.Array_Way != NULL){
         	double x_cour,y_cour;
@@ -91,19 +95,113 @@ int main(int argc,char *argv[]){
         	if(isBuilding(all.Array_Way->way_tag,"highway")){
         		highway=1;
         	}
+        	if(isBuilding(all.Array_Way->way_tag,"waterway")){
+        		waterway=1;
+        	}
         	if(isBuilding(all.Array_Way->way_tag,"natural")){
         		natural=1;
         	}
-        	
+          if(isBuilding(all.Array_Way->way_tag,"landuse")){
+            landuse=1;
+          }
+          if(isBuilding(all.Array_Way->way_tag,"leisure")){
+            leisure=1;
+          }
         	while(tmp!=NULL){
         		x_cour=strtod(tmp->value_ref->lon,NULL);
         		y_cour=strtod(tmp->value_ref->lat,NULL);
-        		x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
-    			y_cour=((y_cour-lat_m)*k2)/360;
+            x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
+    			  y_cour=((y_cour-lat_m)*k2)/360;
         		tabPoly_X[i]=(Sint16) x_cour;
         		tabPoly_Y[i]=(Sint16) (height - y_cour);
         		i++;
         		tmp=tmp->next_nd;
+        	}
+        	if(natural){
+        		int tmp = i-1;
+        		char* value=NULL;
+        		value=valueOf(all.Array_Way->way_tag,"natural");
+        		if(strcmp(value,"water")==0){
+        			filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+       				polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+       				//thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       					//tabPoly_Y[tmp-1],30,153,204,255,255);       				
+        		}
+				    else if(strcmp(value,"canal")==0){
+        			thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       					tabPoly_Y[tmp-1],30,153,204,255,255);
+        		}
+        		else if(strcmp(value,"stream")){
+        			//thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       					//tabPoly_Y[tmp-1],5,153,204,255,255);
+              filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+              polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+        		}
+            else if(strcmp(value,"coastline")==0){
+
+              filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+              polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);              
+            }
+        		natural=0;
+        	}
+       		
+        	if(waterway){
+        		int tmp = i-1;
+        		char* value=NULL;
+        		value=valueOf(all.Array_Way->way_tag,"waterway");
+        		if(strcmp(value,"river")==0){
+        			thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       					tabPoly_Y[tmp-1],20,153,204,255,255);
+        		}
+				    else if(strcmp(value,"canal")==0){
+        			thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       					tabPoly_Y[tmp-1],30,153,204,255,255);
+        			//filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+        		}
+        		else if(strcmp(value,"stream")){
+        			/*thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       					tabPoly_Y[tmp-1],5,153,204,255,255);*/
+        			filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+              //polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+        		}
+            else if(strcmp(value,"riverbank")==0){
+              //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,153,204,255,255);
+              filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+              polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+
+            }
+        		waterway=0;
+        	}
+          if(leisure){
+              //int tmp=i-1;
+            char* value=NULL;
+            value=valueOf(all.Array_Way->way_tag,"leisure");
+            if(strcmp(value,"park")==0){
+              //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,102,255,102,255);
+              filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
+              polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            leisure = 0;
+          }
+        	if(landuse){
+        		//int tmp=i-1;
+        		char* value=NULL;
+        		value=valueOf(all.Array_Way->way_tag,"landuse");
+        		if(strcmp(value,"grass")==0){
+        			//thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       					//tabPoly_Y[tmp-1],20,102,255,102,255);
+              filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
+              polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+        		}
+            else if(strcmp(value,"forest")==0){
+              //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,102,255,102,255);
+              filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,255,102,255);
+              polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            landuse=0;
         	}
        		if(highway){
        			int tmp = i-1;
@@ -114,43 +212,44 @@ int main(int argc,char *argv[]){
 
        					if(strcmp(value,"motorway")==0){
        						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],20,255,102,102);
+       							tabPoly_Y[tmp-1],20,255,102,102,255);
        					}
        					else if(strcmp(value,"trunk")==0){
-       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],20,255,153,51);
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],20,255,153,51,255);
        					}
        					else if(strcmp(value,"primary")==0){
        						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],20,255,178,102,255);
+       							tabPoly_Y[tmp-1],10,255,178,102,255);
        					}
        					else if(strcmp(value,"secondary")==0){
        						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],20,229,255,204,255);
+       							tabPoly_Y[tmp-1],10,204,102,0,255);
        					}
        					else if(strcmp(value,"tertiary")==0){
-       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],20,0xFFFFFFFF);
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],10,224,224,224,255);
        					}
        					else if(strcmp(value,"unclassified")==0){
-       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],10,0xFFFFFFFF);
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],5,224,224,224,255);
        					}
        					else if(strcmp(value,"residential")==0){
-       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],10,0xFFFFFFFF);
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],5,224,224,224,255);
        					}
        					else if(strcmp(value,"service")==0){
-       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],5,0xFFFFFFFF);
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],3,224,224,224,255);
        					}
        					else if(strcmp(value,"pedestrian")==0){
-       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],5,0xFFFFFFFF);
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],3,224,224,224,255);
+
        					}
        					else{
-       						thickLineColor(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       							tabPoly_Y[tmp-1],5,0xFFFFFFFF);	
+       						thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       							tabPoly_Y[tmp-1],5,224,224,224,255);
        					}
        					tmp--;
        						
@@ -161,6 +260,7 @@ int main(int argc,char *argv[]){
        			
        			highway=0;
        		}
+
        		if(building){
        			filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 192,192,192,255);
        			building = 0;

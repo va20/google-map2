@@ -4,6 +4,7 @@
 #include <libxml/parser.h>
 #include <libxml/xmlstring.h>
 #include <string.h>
+#include <stddef.h>
 //#include <libxml/xmlmemory>
 
 #define TAILLE_TABLE 4
@@ -48,7 +49,7 @@ struct AVL_node{
 
 struct Nd{
 	char* ref;
-	AVL_node* value_ref;
+	Node* value_ref;
 	Nd* next_nd;
 };
 
@@ -57,6 +58,7 @@ struct Node{
 	char *visible;
 	char *lon;
 	char *lat;
+
 	Tag* node_tag;
 	Node* suivant;
 	Node* precedent;
@@ -91,6 +93,7 @@ struct AVL_tree_way{
 
 struct Array_All{
 	Node* Array_Node;
+	size_t size_list;
 	Way* Array_Way;
 	Bounds* Array_Bounds;
 	Relation* Array_Relation;
