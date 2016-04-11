@@ -78,6 +78,9 @@ int main(int argc,char *argv[]){
     int leisure=0;
     int railway=0;
     while(!repeat){
+        /*if(all.Array_Way!=NULL){
+            map=draw_ways(map,all.Array_Way,lon_m,lat_m,k2,height);
+        }*/
         while(all.Array_Way != NULL){
         	double x_cour,y_cour;
 
@@ -163,8 +166,8 @@ int main(int argc,char *argv[]){
         			//filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
         		}
         		else if(strcmp(value,"stream")){
-        			/*thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-       					tabPoly_Y[tmp-1],5,153,204,255,255);*/
+        			//thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+       					//tabPoly_Y[tmp-1],5,153,204,255,255);
         			filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
                      //polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
         		}
@@ -325,7 +328,7 @@ int main(int argc,char *argv[]){
        		if(building){
        			filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 192,192,192,255);
        			building = 0;
-       			polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+       			polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);  
      		}
        		free(tabPoly_X);
        		free(tabPoly_Y);
@@ -344,9 +347,16 @@ int main(int argc,char *argv[]){
                 Member* member=NULL;
                 Tag* tag=NULL;
                 Way* way_tmp=NULL;
+                Nd* last = NULL;
+                int cpt = 0;
+                way_tmp=malloc(sizeof(Way));
                 member=all.Array_Relation->member_fils;
                 tag=all.Array_Relation->tag_fils;
+                Way* next_tmp=malloc(sizeof(Way));
+                Sint16 tabPoly_X[200];
+                Sint16 tabPoly_Y[200];
                 while(member!=NULL){
+
                     
                     if(member->node_ref!=NULL){
                        
@@ -359,32 +369,22 @@ int main(int argc,char *argv[]){
                         
                     }
                     else if(member->way_ref!=NULL){
-                        double x_cour,y_cour;
-                        
-                        Nd* tmp=member->way_ref->ref;
-                        int role=Relation_Role(member->role);
-                        if(role==INNER){
-                            if(way_tmp->next_way==NULL){
-                                way_tmp=member->way_ref;    
-                            }
-                            else{
-                                Way* next_tmp=NULL;
-                                next_tmp=way_tmp->next_way;
-                                
-                            }
-                        }
+
                         int i=0;
 
-                        Sint16 *tabPoly_X=NULL;
-                        Sint16 *tabPoly_Y=NULL;
+                        double x_cour,y_cour;
+                        Nd* tmp=member->way_ref->ref;
+                        if(way_tmp==NULL){
+                            way_tmp=member->way_ref;
+                            cpt = way_tmp->nb_ref;
+                        }
+                        else{
+                            next_tmp->next_way=member->way_ref;
+                            way_tmp=next_tmp;
+                            cpt = cpt + way_tmp->nb_ref;
+                        }
 
-                        tabPoly_X=malloc((member->way_ref->nb_ref)*sizeof(Sint16));
-                        tabPoly_Y=malloc((member->way_ref->nb_ref)*sizeof(Sint16));
 
-                        x_cour=strtod(member->way_ref->lon,NULL);
-                        y_cour=strtod(member->way_ref->lat,NULL);
-                        x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
-                        y_cour=((y_cour-lat_m)*k2)/360;
 
                         if(isBuilding(tag,"building")){
                             building=1;
@@ -410,21 +410,155 @@ int main(int argc,char *argv[]){
                         else if(isBuilding(tag,"type")){
 
                         }
-                        while(tmp!=NULL){
-                            x_cour=strtod(tmp->value_ref->lon,NULL);
-                            y_cour=strtod(tmp->value_ref->lat,NULL);
+
+
+
+                        if(last==NULL){
+                            last = member->way_ref->last;
+                        }
+                        if(strcmp(member->way_ref->first->ref,last->ref)==0){
+
+                            
+                            x_cour=strtod(member->way_ref->ref->value_ref->lon,NULL);
+                            y_cour=strtod(member->way_ref->ref->value_ref->lat,NULL);
                             x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
                             y_cour=((y_cour-lat_m)*k2)/360;
-                            tabPoly_X[i]=(Sint16) x_cour;
-                            tabPoly_Y[i]=(Sint16) (height - y_cour);
-                            i++;
-                            tmp=tmp->next_nd;
-                        }
-                    }
 
+                            
+
+                           
+                            cpt = 0;
+                            way_tmp=way_tmp->next_way;
+                            while(way_tmp!=NULL){
+                                while(tmp!=NULL){
+                                    x_cour=strtod(tmp->value_ref->lon,NULL);
+                                    y_cour=strtod(tmp->value_ref->lat,NULL);
+                                    x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
+                                    y_cour=((y_cour-lat_m)*k2)/360;
+                                    tabPoly_X[i]=(Sint16) x_cour;
+                                    tabPoly_Y[i]=(Sint16) (height - y_cour);
+                                    i++;
+                                    tmp=tmp->next_nd;
+                                }
+                                way_tmp = way_tmp->next_way;
+                        }
+
+                            if(strcmp(member->role,"outer")==0){
+                                
+                                if(landuse){
+
+
+                                    char* value=NULL;
+
+                                    value=valueOf(all.Array_Relation->tag_fils,"landuse");
+                                    if(value!=NULL && strcmp(value,"grass")==0){
+                                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                                        filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
+                                        polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                                }
+                                landuse=0;
+                            }
+                                else if(leisure){
+
+
+                                    char* value=NULL;
+
+                                    value=valueOf(all.Array_Relation->tag_fils,"leisure");
+                                    if(value!=NULL && strcmp(value,"park")==0){
+                                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                                        filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
+                                        polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                                }
+                                leisure=0;
+                            }
+                                else if(natural){
+
+
+                                    char* value=NULL;
+
+                                    value=valueOf(all.Array_Relation->tag_fils,"natural");
+                                    if(value!=NULL && strcmp(value,"water")==0){
+                                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                                        filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,0,0,255,255);
+                                        polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                                    }
+                                natural=0;
+                                }
+
+
+                                else {
+                                    //filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 150,150,150,255);
+                                    //polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                                }
+
+                            }
+                            else{
+                                
+                                if(landuse){
+
+
+                                    char* value=NULL;
+
+                                    value=valueOf(all.Array_Relation->tag_fils,"landuse");
+                                    if(value!=NULL && strcmp(value,"grass")==0){
+                                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                                        filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
+                                        polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                                }
+                                landuse=0;
+                            }
+                                else if(leisure){
+
+
+                                    char* value=NULL;
+
+                                    value=valueOf(all.Array_Relation->tag_fils,"leisure");
+                                    if(value!=NULL && strcmp(value,"park")==0){
+                                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                                        filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
+                                        polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                                }
+                                leisure=0;
+                            }
+                                else if(natural){
+
+
+                                    char* value=NULL;
+
+                                    value=valueOf(all.Array_Relation->tag_fils,"natural");
+                                    if(value!=NULL && strcmp(value,"water")==0){
+                                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                                        filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
+                                        polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                                    }
+                                natural=0;
+                                }
+
+                                
+                                else {
+                                    //filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 150,150,150,255);
+                                    //polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                                }
+                                
+                            }
+
+
+
+                            
+                        }
+
+                        
+                    }
                     member=member->next_member;
                 }
             }
+
             all.Array_Relation=all.Array_Relation->next_relation;
         }
         SDL_RenderPresent(map);

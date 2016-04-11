@@ -68,11 +68,12 @@ SDL_Renderer* draw_ways(SDL_Renderer* map,Way* way,double lon_m,double lat_m,dou
             
     Nd* tmp=way->ref;
     int i=0;
-    Sint16 *tabPoly_X=NULL;
-    Sint16 *tabPoly_Y=NULL; 
-    tabPoly_X=malloc((way->nb_ref)*sizeof(Sint16));
-    tabPoly_Y=malloc((way->nb_ref)*sizeof(Sint16));
+
     while(way!=NULL){
+        Sint16 *tabPoly_X=NULL;
+        Sint16 *tabPoly_Y=NULL; 
+        tabPoly_X=malloc((way->nb_ref)*sizeof(Sint16));
+        tabPoly_Y=malloc((way->nb_ref)*sizeof(Sint16));
         if(isBuilding(way->way_tag,"building")){
             building=1;
         }
@@ -307,7 +308,7 @@ SDL_Renderer* draw_ways(SDL_Renderer* map,Way* way,double lon_m,double lat_m,dou
 
             
         if(building){
-            filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 192,192,192,255);
+            filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 255,0,0,255);
             building = 0;
             polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
         }
@@ -318,5 +319,20 @@ SDL_Renderer* draw_ways(SDL_Renderer* map,Way* way,double lon_m,double lat_m,dou
     }
     return map;
 }
+
+/*Way* get_Inner(Member *member,Way* way){
+        if(way==NULL){
+            way=member->way_ref;
+        }
+        else{
+            Way* next_tmp=NULL;
+            next_tmp=malloc(sizeof(Way));
+            next_tmp->next_way=way;
+            way=next_tmp;
+        }
+        member=member->next_member;
+    }
+    return way;
+}*/
 
 
