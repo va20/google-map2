@@ -226,7 +226,7 @@ int main(int argc,char *argv[]){
                     polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                 }
                 else if(strcmp(value,"playground")==0){
-                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],102,178,255
                     //tabPoly_Y[tmp-1],20,102,255,102,255);
                     filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,80,255,80,255);
                     polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
@@ -383,15 +383,22 @@ int main(int argc,char *argv[]){
 
 
 
+<<<<<<< HEAD
+=======
+        int cmp=0;
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
         Sint16 tabPoly_X[2000];
         Sint16 tabPoly_Y[2000];
         while(all.Array_Relation!=NULL){
 
             if(all.Array_Relation->isMultiPolygon){
+                cmp++;
+                
                 Member* member=NULL;
                 Tag* tag=NULL;
                 Tag* tagway=NULL;
                 Way* way_tmp=NULL;
+<<<<<<< HEAD
                 Nd* first = NULL;
                 Way* next_tmp=NULL;
                 
@@ -401,6 +408,20 @@ int main(int argc,char *argv[]){
                 member=all.Array_Relation->member_fils;
                 tag=all.Array_Relation->tag_fils;
                 
+=======
+                Way* next_tmp=NULL;
+                Nd* first = NULL;
+                
+                
+                
+                way_tmp=malloc(sizeof(Way));
+                next_tmp=malloc(sizeof(Way));
+                
+                member=all.Array_Relation->member_fils;
+                tag=all.Array_Relation->tag_fils;
+                
+                
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                 while(member!=NULL){
 
                     
@@ -415,14 +436,23 @@ int main(int argc,char *argv[]){
                         
                     }
                     else if(member->way_ref!=NULL){
+<<<<<<< HEAD
                         if(first==NULL){
                             first = member->way_ref->first;
                         }
 
+=======
+                        
+                        if(first==NULL){
+                            first = member->way_ref->first;
+                        }
+                        
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                         int i=0;
                         tagway = member->way_ref->way_tag;
 
                         double x_cour,y_cour;
+
                         Nd* tmp=member->way_ref->ref;
                         if(way_tmp==NULL){
                             way_tmp=member->way_ref;
@@ -431,6 +461,10 @@ int main(int argc,char *argv[]){
                         else{
                             next_tmp->next_way=member->way_ref;
                             way_tmp=next_tmp;
+<<<<<<< HEAD
+=======
+                            
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                         }
 
 
@@ -460,10 +494,16 @@ int main(int argc,char *argv[]){
 
                         }
 
+<<<<<<< HEAD
 
 
                         if(strcmp(member->way_ref->last->ref,first->ref)==0){
                            
+=======
+                        if(strcmp(member->way_ref->last->ref,first->ref)==0){
+                            printf("last %s first %s\n",member->way_ref->last->ref, first->ref);
+                            first=NULL;
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                             
 
                             x_cour=strtod(member->way_ref->ref->value_ref->lon,NULL);
@@ -474,7 +514,11 @@ int main(int argc,char *argv[]){
                             first=NULL;
 
                            
+<<<<<<< HEAD
                             
+=======
+                           
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                             //way_tmp=way_tmp->next_way;
                             while(way_tmp!=NULL){
                                 while(tmp!=NULL){
@@ -507,8 +551,12 @@ int main(int argc,char *argv[]){
                                         filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
                                         polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                     }
+<<<<<<< HEAD
                                     
                                     
+=======
+                                    landuse=0;
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                                 }
                                 else if(leisure){
 
@@ -522,6 +570,7 @@ int main(int argc,char *argv[]){
                                         filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
                                         polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                     }
+<<<<<<< HEAD
                                     else if(value!=NULL && strcmp(value,"garden")==0){
                                         //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
                                         //tabPoly_Y[tmp-1],20,102,255,102,255);
@@ -546,6 +595,9 @@ int main(int argc,char *argv[]){
                                         filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,80,255,80,255);
                                         polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                     }
+=======
+                                    leisure=0;
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                                 }
                                 else if(natural){
 
@@ -560,6 +612,7 @@ int main(int argc,char *argv[]){
                                         filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,178,255,255);
                                         polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                     }
+<<<<<<< HEAD
                                     else if(strcmp(value,"canal")==0){
                                         thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
                                             tabPoly_Y[tmp-1],30,153,204,255,255);
@@ -582,11 +635,17 @@ int main(int argc,char *argv[]){
                                     filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,150,150,150,255);
                                     polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
 
+=======
+                                    natural=0;
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                                 }
 
 
                                 else {
+<<<<<<< HEAD
                                     SDL_SetRenderTarget(map,internes);
+=======
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                                     filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 150,150,150,255);
                                     polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                 }
@@ -608,10 +667,16 @@ int main(int argc,char *argv[]){
                                     //tabPoly_Y[tmp-1],20,102,255,102,255);
                                         filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
                                         polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+<<<<<<< HEAD
                                 
                                 }
                             }
                                 
+=======
+                                    }
+                                    landuse=0;
+                                }
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                                 else if(leisure){
 
 
@@ -624,6 +689,7 @@ int main(int argc,char *argv[]){
                                         filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,50,255,50,255);
                                         polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                     }
+<<<<<<< HEAD
                                     else if(value!=NULL && strcmp(value,"garden")==0){
                                         //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
                                         //tabPoly_Y[tmp-1],20,102,255,102,255);
@@ -649,6 +715,10 @@ int main(int argc,char *argv[]){
                                         polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                     }
                             }
+=======
+                                    leisure=0;
+                                }
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                                 else if(natural){
 
                                     int tmp = i-1;
@@ -661,6 +731,7 @@ int main(int argc,char *argv[]){
                                         filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,178,255,255);
                                         polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                     }
+<<<<<<< HEAD
                                     else if(strcmp(value,"canal")==0){
                                         thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
                                             tabPoly_Y[tmp-1],30,153,204,255,255);
@@ -687,10 +758,26 @@ int main(int argc,char *argv[]){
                                 else{
                                     SDL_SetRenderTarget(map,internes);
                                     filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,255,0,0,255);
+=======
+                                    natural=0;
+                                }
+
+                                
+                                else {
+                                    filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,255,102,255);
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                                     polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                                 }   
                             }   
                         }
+<<<<<<< HEAD
+=======
+                        
+                        else{
+                            //first->ref!=last->ref
+                            printf("dans else last %s first %s\n",member->way_ref->last->ref, first->ref);
+                        }
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
                     }
                     way_tmp=NULL;
                     next_tmp=NULL;
@@ -698,6 +785,7 @@ int main(int argc,char *argv[]){
                     member=member->next_member;
                 }
             }
+<<<<<<< HEAD
             building = 0;
             leisure = 0;
             landuse = 0;
@@ -718,6 +806,12 @@ int main(int argc,char *argv[]){
         SDL_RenderCopy(map,primaires,NULL,NULL);
         SDL_RenderCopy(map,autoroutes,NULL,NULL);
 
+=======
+            printf("%d\n",cmp);
+            all.Array_Relation=all.Array_Relation->next_relation;
+        }
+        
+>>>>>>> 2a9b4291ff66d9c54255ed3e30dc616ae983d612
         SDL_RenderPresent(map);
         SDL_PollEvent(&event);
         switch(event.type){
