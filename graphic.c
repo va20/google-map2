@@ -15,7 +15,8 @@ SDL_Window* Create_Window(int height,int width){
         printf("Erreur fenetre %s\n",SDL_GetError());
         return NULL;
     }
-    map=SDL_CreateRenderer(fenetre,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+    //map=SDL_CreateRenderer(fenetre,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+    map=SDL_CreateRenderer(fenetre,-1,0);
     if(map==NULL){
         printf("Erreur render %s\n",SDL_GetError());
         return NULL;
