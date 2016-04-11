@@ -32,6 +32,7 @@ struct Bounds{
 struct Tag{
 	char *key;
 	char *value;
+	int multip_test;
 	Tag* suivant;
 };
 
@@ -70,6 +71,9 @@ struct Way{
 	char *id;
 	char *visible;
 	Nd* ref;
+	int islast;
+	Nd* first;
+	Nd* last;
 	int nb_ref;
 	char *way_type;
 	Tag* way_tag;
@@ -114,6 +118,7 @@ struct Relation{
 	char* visible;
 	Member* member_fils;
 	Tag* tag_fils;
+	int isMultiPolygon;
 	Relation* next_relation;
 };
 

@@ -11,12 +11,11 @@ unite.c implementation
  */	
 
 int main(int argc,char *argv[]){
-
-	if(argc >2){
+    if(argc >2){
 		fprintf(stderr, "erreur nombre d'arguments\n");
 		return -1;
 	}
-	Array_All all;
+    Array_All all;
 	all.Array_Bounds=NULL;
 	all.Array_Node=NULL;
     all.size_list_node=0;
@@ -36,8 +35,7 @@ int main(int argc,char *argv[]){
 
 
 
-	SDL_Window* fenetre=Create_Window(all.Array_Bounds->maxlat,all.Array_Bounds->minlat,
-		all.Array_Bounds->maxlon,all.Array_Bounds->minlon);
+	
 
     lat_mx=strtod(all.Array_Bounds->maxlat,NULL);
     lat_m=strtod(all.Array_Bounds->minlat,NULL);
@@ -46,20 +44,22 @@ int main(int argc,char *argv[]){
     double x,y;
     x=y=0;
     int height=0;
+    int width=0;
     double x_lat_max = (lon_mx - lon_m) * cos (lat_mx * 3.14 / 180);
 
     double x_lat_min = (lon_mx - lon_m) * cos (lat_m  * 3.14 / 180);
     x = (x_lat_max > x_lat_min) ? x_lat_max : x_lat_min;
     y = lat_mx - lat_m;
     if(x>y){
-        //width=1200;
+        width=1200;
         height=(y*1200)/x;
     }
     else{
         height=1200;
-        //width=(x*1200)/y;
+        width=(x*1200)/y;
 
     }
+    SDL_Window* fenetre=Create_Window(height,width);
     //double k=(800*360)/((lat_mx-lat_m);
     double k2=(height*360)/y;
 	SDL_Renderer* map=SDL_GetRenderer(fenetre);
@@ -79,8 +79,8 @@ int main(int argc,char *argv[]){
     int railway=0;
     while(!repeat){
         while(all.Array_Way != NULL){
+            printf("dernier %s\n",all.Array_Way->last->ref);
         	double x_cour,y_cour;
-        	
         	//initialisation pour le premier point
         	
         	Nd* tmp=all.Array_Way->ref;
@@ -300,10 +300,6 @@ int main(int argc,char *argv[]){
        				tmp--;
        						
     			}
-       				
-       				
-       				//printf("je suis la\n");
-       			
        			highway=0;
        		}
             if(railway){
@@ -311,14 +307,18 @@ int main(int argc,char *argv[]){
                 char* value=NULL;
                 value=valueOf(all.Array_Way->way_tag,"railway");
                 if(strcmp(value,"rail")==0){
-                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-                      //  tabPoly_Y[tmp-1],20,102,0,0,255);
-                    filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,0,0,255);
-                    polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                    thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                      tabPoly_Y[tmp-1],10,102,0,0,255);
+                    //filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,0,0,255);
+                    //polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
                 }
                 else if(strcmp(value,"tram")==0){
                     thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
-                        tabPoly_Y[tmp-1],20,102,0,0,255);
+                        tabPoly_Y[tmp-1],7,102,0,0,255);
+                }
+                else if(strcmp(value,"disused")==0){
+                    thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],7,102,0,0,255);
                 }
                 railway = 0;
             }
@@ -334,7 +334,49 @@ int main(int argc,char *argv[]){
             all.Array_Way = all.Array_Way->next_way;
         }
         while(all.Array_Relation!=NULL){
+
+            if(all.Array_Relation->isMultiPolygon){
+                Member* member=NULL;
+                member=all.Array_Relation->member_fils;
+                while(member!=NULL){
+                    
+                    if(member->node_ref!=NULL){
+                       /* printf("multipolygon\n");
+                        double x_cour,y_cour;
+                        x_cour=strtod(member->node_ref->lon,NULL);
+                        y_cour=strtod(member->node_ref->lat,NULL);
+                        x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
+                        y_cour=((y_cour-lat_m)*k2)/360;
+                        pixelRGBA(map,(Sint16)x_cour,(Sint16)y_cour,255,255,255,255);
+                        printf("node\n");
+                    }
+                    else if(member->way_ref!=NULL){
+                        double x_cour,y_cour;
+            //initialisation pour le premier point
             
+                        Nd* tmp=all.Array_Way->ref;
+                        //printf("avant if \n");
+                        //printf("%s\n",all.Array_Way->way_tag->key);
+                        int i=0;
+                        Sint16 *tabPoly_X=NULL;
+                        Sint16 *tabPoly_Y=NULL;
+                        tabPoly_X=malloc((all.Array_Way->nb_ref)*sizeof(Sint16));
+                        tabPoly_Y=malloc((all.Array_Way->nb_ref)*sizeof(Sint16));
+
+                        */
+                        /*double x_cour,y_cour;
+                        x_cour=strtod(member->way_ref->lon,NULL);
+                        y_cour=strtod(member->way_ref->lat,NULL);
+                        x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
+                        y_cour=((y_cour-lat_m)*k2)/360;*/
+                        printf("way\n");
+
+                    }
+
+                    member=member->next_member;
+                }
+            }
+            all.Array_Relation=all.Array_Relation->next_relation;
         }
         SDL_RenderPresent(map);
         SDL_PollEvent(&event);

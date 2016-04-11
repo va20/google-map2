@@ -48,9 +48,12 @@ Tag* Tag_Retrieve(xmlNodePtr xml_node){
 	static int cmpTag=0;
 	Tag* tag=NULL;
 	tag=malloc(sizeof(Tag));
-
+	tag->multip_test=0;
 	tag->key=(char *)xmlGetProp(xml_node,(const xmlChar *)"k");
 	tag->value=(char *)xmlGetProp(xml_node,(const xmlChar *)"v");
+	if(strcmp(tag->value,"multipolygon")==0){
+		tag->multip_test=1;
+	}
 	tag->suivant=NULL;
 	cmpTag++;
 	//printf("tag %d\n",cmpTag );
@@ -79,11 +82,7 @@ Member* Member_Retrieve(xmlNodePtr xml_member){
 	if(strcmp(member->type,"way")==0){
 		ENTRY tmp;
 		tmp.key=member->ref;
-		if(hsearch(tmp,FIND)==NULL){
-			//printf("REFRENCE TO WAY DOES NOT EXIST \n");
-			
-		}
-		else{
+		if(hsearch(tmp,FIND)!=NULL){
 			ENTRY* item=NULL;
 			item=hsearch(tmp,FIND);
 			member->way_ref=item->data;
@@ -92,10 +91,7 @@ Member* Member_Retrieve(xmlNodePtr xml_member){
 	else if(strcmp(member->type,"node")==0){
 		ENTRY tmp;
 		tmp.key=member->ref;
-		if(hsearch(tmp,FIND)==NULL){
-			//printf("REFRENCE TO NODE DOES NOT EXIST \n");
-		}
-		else{
+		if(hsearch(tmp,FIND)!=NULL){
 			ENTRY* item=NULL;
 			item=hsearch(tmp,FIND);
 			member->way_ref=item->data;
@@ -186,7 +182,7 @@ Nd* Nd_Retrieve(xmlNodePtr xml_nd){
 	Nd* nd=NULL;
 	nd=malloc(sizeof(Nd));
 	char* ref_node=(char *)xmlGetProp(xml_nd,(const xmlChar *)"ref");
-	nd->ref=ref_node; 
+	nd->ref=ref_node;
 	nd->next_nd=NULL;
 	ENTRY tmp;
 	tmp.key=nd->ref;
@@ -207,11 +203,18 @@ Way* Nd_add_Way(xmlNodePtr nd_To_add,Way* way){
 	if(way->ref==NULL){
 		nd=Nd_Retrieve(nd_To_add);
 		way->ref=nd;
+		way->first=nd;
+		if(way->islast){
+			way->last=nd;
+		}
 		return way;
 	}
 	nd=Nd_Retrieve(nd_To_add);
 	nd->next_nd=way->ref;
 	way->ref=nd;
+	if(way->islast){
+		way->last=nd;
+	}
 	return way;
 }
 //methode pour recuperer les valeurs des attributs d'un noeud
@@ -265,7 +268,10 @@ Way* Way_Retrieve(xmlNodePtr xml_way){
 	way->id=(char *)xmlGetProp(xml_way,(const xmlChar *)"id");
 	way->visible=(char *)xmlGetProp(xml_way,(const xmlChar *)"visible");
 	way->next_way=NULL;
+	way->first=NULL;
+	way->last=NULL;
 	way->ref=NULL;
+	way->islast=0;
 	way->nb_ref=0;
 	way->way_tag=NULL;
 	if(xml_way->children!=NULL){
@@ -276,6 +282,9 @@ Way* Way_Retrieve(xmlNodePtr xml_way){
 			}
 			if((!xmlStrcmp(xml_way->name,(const xmlChar*)"nd"))){
 				way->nb_ref++;
+				if((xmlStrcmp(xml_way->next->name,(const xmlChar*)"nd"))){
+					way->islast=1;
+				}
 				way=Nd_add_Way(xml_way,way);
 			}
 			xml_way=xml_way->next;
@@ -316,11 +325,17 @@ Relation* Tag_add_Relation(xmlNodePtr tag_To_add,Relation* relation){
 	if(relation->tag_fils==NULL){
 		tag=Tag_Retrieve(tag_To_add);
 		relation->tag_fils=tag;
+		if(tag->multip_test){
+			relation->isMultiPolygon=1;
+		}
 		return relation;
 	}
 	tag=Tag_Retrieve(tag_To_add);
 	tag->suivant=relation->tag_fils;
 	relation->tag_fils=tag;
+	if(tag->multip_test){
+			relation->isMultiPolygon=1;
+	}
 	return relation;
 }
 
@@ -332,6 +347,7 @@ Relation* Relation_Retrieve(xmlNodePtr xml_relation){
 	relation->member_fils=NULL;
 	relation->tag_fils=NULL;
 	relation->next_relation=NULL;
+	relation->isMultiPolygon=0;
 	if(xml_relation->children!=NULL){
 		xml_relation=xml_relation->xmlChildrenNode;
 		while(xml_relation->next!=NULL){

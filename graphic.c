@@ -1,46 +1,7 @@
 #include "graphic.h"
 
 
-SDL_Window* Create_Window(char* lat_max,char* lat_min,char* lon_max,char* lon_min){
-    double lat_mx,lat_m,lon_mx,lon_m;
-    lat_mx=lat_m=lon_mx=lon_m=0;
-    lat_mx=strtod(lat_max,NULL);
-    lat_m=strtod(lat_min,NULL);
-    lon_mx=strtod(lon_max,NULL);
-    lon_m=strtod(lon_min,NULL);
-    double x,y;
-    int height,width;
-
-    double x_lat_max = (lon_mx - lon_m) * cos (lat_mx * 3.14 / 180);
-    double x_lat_min = (lon_mx - lon_m) * cos (lat_m  * 3.14 / 180);
-    x = (x_lat_max > x_lat_min) ? x_lat_max : x_lat_min;
-    y = lat_mx - lat_m;
-    if(x>y){
-        width=1200;
-        height=(y*1200)/x;
-    }
-    else{
-        height=1200;
-        width=(x*1200)/y;
-
-    }
-/*
-    x=lon_mx-lon_m;
-    y=lat_mx-lat_m;
-    if(x>y){
-        width=1200;
-        height=(y*1200)/x;
-    }
-    else{
-        height=1200;
-        width=(x*1200)/y;
-
-    }
-*/
-    /*printf("lat max %f\n",lat_mx );
-    printf("lat m %f\n",lat_m );
-    printf("lon max %f\n",lon_mx );
-    printf("lon m %f\n",lon_m );*/
+SDL_Window* Create_Window(int height,int width){
 
     SDL_Window* fenetre=NULL;
     SDL_Renderer* map=NULL;
@@ -61,31 +22,6 @@ SDL_Window* Create_Window(char* lat_max,char* lat_min,char* lon_max,char* lon_mi
     }
     return fenetre;
 }
-
-int Tab_size(Way* way){
-    int size=0;
-    while(way->ref!=NULL){
-        size++;
-        way->ref=way->ref->next_nd;
-    }
-    //printf("size %d\n",size);
-    return size;
-}
-
-Sint16* create_tab_poly(Way* way){
-    Sint16* tab=NULL;
-    int taille=0;
-    while(way->ref!=NULL){
-        taille++;
-        way->ref=way->ref->next_nd;
-    }
-    tab=(Sint16*)malloc(taille*sizeof(Sint16));
-    if(tab==NULL){
-        printf("ERROR CREATION TABLE POLYGON\n");
-        exit(0);
-    }
-    return tab;
-}   
 
 int isBuilding(Tag* tag,char* word){
     int rep=0;
@@ -118,43 +54,269 @@ char* valueOf(Tag* tag,char* word){
     return NULL;
 }
 
-void init_tab_poly(Sint16* tab_X,Sint16* tab_Y,Way* way,double k,double lon_m,
-    double lat_m,int height,int size){
-    int i=0;
+SDL_Renderer* draw_ways(SDL_Renderer* map,Way* way,double lon_m,double lat_m,double k2,int height){
+    int building=0;
+    int highway=0;
+    int waterway=0;
+    int natural=0;
+    int landuse=0;
+    int leisure=0;
+    int railway=0;
+
     double x_cour,y_cour;
-    x_cour=y_cour=0;
-    Nd* nd_ref=NULL;
-    nd_ref=way->ref;
-    while(nd_ref!=NULL){
-        x_cour=strtod(nd_ref->value_ref->lon,NULL);
-        y_cour=strtod(nd_ref->value_ref->lat,NULL);
-        x_cour=((x_cour-lon_m)*k*cos(y_cour*(3.14/180)))/360;
-        y_cour=((y_cour-lat_m)*k)/360;
-        tab_X[i]=(int)x_cour;
-        tab_Y[i]=(int)y_cour;
-        i++;
-        nd_ref=nd_ref->next_nd;
+            //initialisation pour le premier point
+            
+    Nd* tmp=way->ref;
+    int i=0;
+    Sint16 *tabPoly_X=NULL;
+    Sint16 *tabPoly_Y=NULL; 
+    tabPoly_X=malloc((way->nb_ref)*sizeof(Sint16));
+    tabPoly_Y=malloc((way->nb_ref)*sizeof(Sint16));
+    while(way!=NULL){
+        if(isBuilding(way->way_tag,"building")){
+            building=1;
+        }
+        if(isBuilding(way->way_tag,"railway")){
+            railway=1; 
+        }
+        if(isBuilding(way->way_tag,"highway")){
+            highway=1;
+        }
+        if(isBuilding(way->way_tag,"waterway")){
+            waterway=1;
+        }
+        if(isBuilding(way->way_tag,"natural")){
+            natural=1;
+        }
+        if(isBuilding(way->way_tag,"landuse")){
+            landuse=1;
+        } 
+        if(isBuilding(way->way_tag,"leisure")){
+            leisure=1;
+        }
+        while(tmp!=NULL){
+            x_cour=strtod(tmp->value_ref->lon,NULL);
+            y_cour=strtod(tmp->value_ref->lat,NULL);
+            x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
+            y_cour=((y_cour-lat_m)*k2)/360;
+            tabPoly_X[i]=(Sint16) x_cour;
+            tabPoly_Y[i]=(Sint16) (height - y_cour);
+            i++;
+            tmp=tmp->next_nd;
+        }
+        if(natural){
+            int tmp = i-1;
+            char* value=NULL;
+            value=valueOf(way->way_tag,"natural");
+            if(strcmp(value,"water")==0){
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        //tabPoly_Y[tmp-1],30,153,204,255,255);                     
+            }
+            else if(strcmp(value,"canal")==0){
+                thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    tabPoly_Y[tmp-1],30,153,204,255,255);
+            }
+            else if(strcmp(value,"stream")){
+                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        //tabPoly_Y[tmp-1],1,102,178,255,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            else if(strcmp(value,"coastline")==0){
+
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);              
+            }
+            natural=0;
+        }
+            
+        if(waterway){
+            int tmp = i-1;
+            char* value=NULL;
+            value=valueOf(way->way_tag,"waterway");
+            if(strcmp(value,"river")==0){
+                thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    tabPoly_Y[tmp-1],20,153,204,255,255);
+            }
+            else if(strcmp(value,"canal")==0){
+                thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    tabPoly_Y[tmp-1],30,153,204,255,255);
+                    //filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+            }
+            else if(strcmp(value,"stream")){
+                    /*thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],5,153,204,255,255);*/
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+                     //polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            else if(strcmp(value,"riverbank")==0){
+                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    //tabPoly_Y[tmp-1],20,153,204,255,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,178,255,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+
+            }
+            waterway=0;
+        }
+        if(leisure){
+            //int tmp=i-1;
+            char* value=NULL;
+            value=valueOf(way->way_tag,"leisure");
+            if(strcmp(value,"park")==0){
+                //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,102,255,102,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,255,255,102,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            else if(strcmp(value,"garden")==0){
+                //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,102,255,102,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,0,102,0,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            else if(strcmp(value,"playground")==0){
+                //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,102,255,102,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,80,255,80,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            else if(strcmp(value,"bandstand")==0){
+                //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,102,255,102,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,80,255,80,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            else if(strcmp(value,"pitch")==0){
+                //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,102,255,102,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,80,255,80,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            leisure = 0;
+        }
+        if(landuse){
+            //int tmp=i-1;
+            char* value=NULL;
+            value=valueOf(way->way_tag,"landuse");
+            if(strcmp(value,"grass")==0){
+                //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i,102,255,102,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            else if(strcmp(value,"forest")==0){
+                //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                //tabPoly_Y[tmp-1],20,102,255,102,255);
+                filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,255,102,255);
+                polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+            }
+            else if(strcmp(value,"basin")==0){
+                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                    filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,255,102,255);
+                    polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                }
+                else if(strcmp(value,"village_green")==0){
+                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    //tabPoly_Y[tmp-1],20,102,255,102,255);
+                    filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,255,102,255);
+                    polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                }
+                else if(strcmp(value,"railway")==0){
+                    //thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    //tabPoly_Y[tmp-1],20,255,204,204,255);
+                    filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 255,204,204,255);
+                    polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                }
+                landuse=0;
+            }
+            if(highway){
+                int tmp = i-1;
+                while(tmp>0){
+                    char *value=NULL;
+                    value=valueOf(way->way_tag,"highway");
+
+                    if(strcmp(value,"motorway")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],20,255,102,102,255);
+                    }
+                    else if(strcmp(value,"trunk")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],20,255,153,51,255);
+                    }
+                    else if(strcmp(value,"primary")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],10,255,178,102,255);
+                    }
+                    else if(strcmp(value,"secondary")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],10,204,102,0,255);
+                    }
+                    else if(strcmp(value,"tertiary")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],10,224,224,224,255);
+                    }
+                    else if(strcmp(value,"unclassified")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],5,224,224,224,255);
+                    }
+                    else if(strcmp(value,"residential")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],5,224,224,224,255);
+                    }
+                    else if(strcmp(value,"service")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],3,224,224,224,255);
+                    }
+                    else if(strcmp(value,"pedestrian")==0){
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],3,224,224,224,255);
+
+                    }
+                    else{
+                        thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],5,224,224,224,255);
+                    }
+                    tmp--;
+                            
+                }
+                highway=0;
+            }
+            if(railway){
+                int tmp = i-1;
+                char* value=NULL;
+                value=valueOf(way->way_tag,"railway");
+                if(strcmp(value,"rail")==0){
+                    thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                        tabPoly_Y[tmp-1],10,102,0,0,255);
+                    //filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 102,0,0,255);
+                    //polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+                }
+            else if(strcmp(value,"tram")==0){
+                thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    tabPoly_Y[tmp-1],7,102,0,0,255);
+            }
+            else if(strcmp(value,"disused")==0){
+                thickLineRGBA(map,tabPoly_X[tmp],tabPoly_Y[tmp],tabPoly_X[tmp-1],
+                    tabPoly_Y[tmp-1],7,102,0,0,255);
+            }
+            railway = 0;
+        }
+
+            
+        if(building){
+            filledPolygonRGBA(map,tabPoly_X,tabPoly_Y,i, 192,192,192,255);
+            building = 0;
+            polygonRGBA(map, tabPoly_X, tabPoly_Y, i, 0, 0, 0, 255);
+        }
+        free(tabPoly_X);
+        free(tabPoly_Y);
+        i = 0;
+        way = way->next_way;
     }
+    return map;
 }
 
-void draw_points(Node* list_node,SDL_Renderer* map){
-    int lat_y,lon_x;
-    lat_y=lon_x=0;
-    while(list_node!=NULL){
-        lat_y=atoi(list_node->lat);
-        lon_x=atoi(list_node->lon);
-        SDL_Event event;
-        int repeat = 0;
-        while(!repeat){
-            SDL_SetRenderDrawColor(map,0,0,0,255);
-            SDL_RenderDrawPoint(map,lon_x,lat_y);
-            SDL_RenderPresent(map);
-            SDL_PollEvent(&event);
-            switch(event.type){
-            case SDL_QUIT:
-                repeat=1;
-                break;
-            }
-        }
-    }
- }
+
