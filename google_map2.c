@@ -435,25 +435,25 @@ int main(int argc,char *argv[]){
 
 
 
-                        if(isBuilding(tag,"building") | isBuilding(tagway,"building")){
+                        if(isBuilding(tag,"building") || isBuilding(tagway,"building")){
                             building=1;
                         }
-                        else if(isBuilding(tag,"railway") | isBuilding(tagway,"railway")){
+                        else if(isBuilding(tag,"railway") || isBuilding(tagway,"railway")){
                             railway=1; 
                         }
-                        else if(isBuilding(tag,"highway") | isBuilding(tagway,"highway")){
+                        else if(isBuilding(tag,"highway") || isBuilding(tagway,"highway")){
                             highway=1;
                         }
-                        else if(isBuilding(tag,"waterway") | isBuilding(tagway,"waterway")){
+                        else if(isBuilding(tag,"waterway") || isBuilding(tagway,"waterway")){
                             waterway=1;
                         }
-                        else if(isBuilding(tag,"natural") | isBuilding(tagway,"natural")){
+                        else if(isBuilding(tag,"natural") || isBuilding(tagway,"natural")){
                             natural=1;
                         }
-                        else if(isBuilding(tag,"landuse") | isBuilding(tagway,"landuse")){
+                        else if(isBuilding(tag,"landuse") || isBuilding(tagway,"landuse")){
                             landuse=1;
                         } 
-                        else if(isBuilding(tag,"leisure") | isBuilding(tagway,"leisure")){
+                        else if(isBuilding(tag,"leisure") || isBuilding(tagway,"leisure")){
                             leisure=1;
                         }
                         else if(isBuilding(tag,"type")){
