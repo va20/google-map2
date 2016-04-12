@@ -5,16 +5,13 @@
 #include "tree_node_structure.h"
 #include "tree_way_structure.h"
 #include "SDL2/SDL2_gfxPrimitives.h"
+#define pi 3.14159265359
 
 SDL_Window* Create_Window(int,int);
 
 int isBuilding(Tag*,char*);
 
 char* valueOf(Tag*,char*);
-
-SDL_Renderer* draw_ways(SDL_Renderer*,Way*,double,double,double,int);
-
-Way* get_Inner(Member*,Way*);
 
 #endif /* GRAPHIQUE */
 

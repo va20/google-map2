@@ -5,7 +5,6 @@
 #include <libxml/xmlstring.h>
 #include <string.h>
 #include <stddef.h>
-//#include <libxml/xmlmemory>
 
 #define TAILLE_TABLE 4
 
@@ -21,6 +20,7 @@ typedef struct AVL_tree_node AVL_tree_node;
 typedef struct AVL_node AVL_node;
 typedef struct AVL_tree_way AVL_tree_way;
 typedef struct AVL_way AVL_way;
+
 
 struct Bounds{
 	char *minlat;
@@ -75,6 +75,7 @@ struct Way{
 	Nd* first;
 	Nd* last;
 	int nb_ref;
+	int is_present;
 	char *way_type;
 	Tag* way_tag;
 	Way* next_way;

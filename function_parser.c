@@ -99,7 +99,6 @@ Member* Member_Retrieve(xmlNodePtr xml_member){
 	}
 	member->next_member=NULL;
 	cmpMem++;
-	//printf("member %d\n",cmpMem);
 	return member;
 }
 
@@ -130,15 +129,6 @@ Way* Tag_add_Way(xmlNodePtr tag_To_add,Way* way){
 
 }
 
-/*void get_AVL_TreeNode(Node* node_list){
-	while(node_list!=NULL){
-		tree_node=insertion_node(tree_node,node_list);
-		//printf("node insere %s\n",node_list->id );
-		node_list=node_list->suivant;
-	}
-	//printf("tree node\n");
-	//affiche(tree_node);
-}*/
 
 	void hash_TableNode(Node* node, size_t size){
 		int descripter=0;
@@ -273,6 +263,7 @@ Way* Tag_add_Way(xmlNodePtr tag_To_add,Way* way){
 		way->ref=NULL;
 		way->islast=0;
 		way->nb_ref=0;
+		way->is_present=0;
 		way->way_tag=NULL;
 		if(xml_way->children!=NULL){
 			xml_way=xml_way->xmlChildrenNode;
