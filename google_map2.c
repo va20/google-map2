@@ -79,13 +79,12 @@ int main(int argc,char *argv[]){
     int railway=0;
     while(!repeat){
         while(all.Array_Way != NULL){
-            printf("dernier %s\n",all.Array_Way->last->ref);
         	double x_cour,y_cour;
+
         	//initialisation pour le premier point
         	
         	Nd* tmp=all.Array_Way->ref;
-        	//printf("avant if \n");
-        	//printf("%s\n",all.Array_Way->way_tag->key);
+        
         	int i=0;
         	Sint16 *tabPoly_X=NULL;
         	Sint16 *tabPoly_Y=NULL;
@@ -333,44 +332,94 @@ int main(int argc,char *argv[]){
        		i = 0;
             all.Array_Way = all.Array_Way->next_way;
         }
+        
+
+
+
+
+
         while(all.Array_Relation!=NULL){
 
             if(all.Array_Relation->isMultiPolygon){
                 Member* member=NULL;
+                Tag* tag=NULL;
+                Way* way_tmp=NULL;
                 member=all.Array_Relation->member_fils;
+                tag=all.Array_Relation->tag_fils;
                 while(member!=NULL){
                     
                     if(member->node_ref!=NULL){
-                       /* printf("multipolygon\n");
+                       
                         double x_cour,y_cour;
                         x_cour=strtod(member->node_ref->lon,NULL);
                         y_cour=strtod(member->node_ref->lat,NULL);
                         x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
                         y_cour=((y_cour-lat_m)*k2)/360;
                         pixelRGBA(map,(Sint16)x_cour,(Sint16)y_cour,255,255,255,255);
-                        printf("node\n");
+                        
                     }
                     else if(member->way_ref!=NULL){
                         double x_cour,y_cour;
-            //initialisation pour le premier point
-            
-                        Nd* tmp=all.Array_Way->ref;
-                        //printf("avant if \n");
-                        //printf("%s\n",all.Array_Way->way_tag->key);
+                        
+                        Nd* tmp=member->way_ref->ref;
+                        int role=Relation_Role(member->role);
+                        if(role==INNER){
+                            if(way_tmp->next_way==NULL){
+                                way_tmp=member->way_ref;    
+                            }
+                            else{
+                                Way* next_tmp=NULL;
+                                next_tmp=way_tmp->next_way;
+                                
+                            }
+                        }
                         int i=0;
+
                         Sint16 *tabPoly_X=NULL;
                         Sint16 *tabPoly_Y=NULL;
-                        tabPoly_X=malloc((all.Array_Way->nb_ref)*sizeof(Sint16));
-                        tabPoly_Y=malloc((all.Array_Way->nb_ref)*sizeof(Sint16));
 
-                        */
-                        /*double x_cour,y_cour;
+                        tabPoly_X=malloc((member->way_ref->nb_ref)*sizeof(Sint16));
+                        tabPoly_Y=malloc((member->way_ref->nb_ref)*sizeof(Sint16));
+
                         x_cour=strtod(member->way_ref->lon,NULL);
                         y_cour=strtod(member->way_ref->lat,NULL);
                         x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
-                        y_cour=((y_cour-lat_m)*k2)/360;*/
-                        printf("way\n");
+                        y_cour=((y_cour-lat_m)*k2)/360;
 
+                        if(isBuilding(tag,"building")){
+                            building=1;
+                        }
+                        else if(isBuilding(tag,"railway")){
+                            railway=1; 
+                        }
+                        else if(isBuilding(tag,"highway")){
+                            highway=1;
+                        }
+                        else if(isBuilding(tag,"waterway")){
+                            waterway=1;
+                        }
+                        else if(isBuilding(tag,"natural")){
+                            natural=1;
+                        }
+                        else if(isBuilding(tag,"landuse")){
+                            landuse=1;
+                        } 
+                        else if(isBuilding(tag,"leisure")){
+                            leisure=1;
+                        }
+                        else if(isBuilding(tag,"type")){
+
+                        }
+                        while(tmp!=NULL){
+                            x_cour=strtod(tmp->value_ref->lon,NULL);
+                            y_cour=strtod(tmp->value_ref->lat,NULL);
+                            x_cour=((x_cour-lon_m)*k2*cos(y_cour*(3.14/180)))/360;
+                            y_cour=((y_cour-lat_m)*k2)/360;
+                            tabPoly_X[i]=(Sint16) x_cour;
+                            tabPoly_Y[i]=(Sint16) (height - y_cour);
+                            i++;
+                            tmp=tmp->next_nd;
+                        }
                     }
 
                     member=member->next_member;
