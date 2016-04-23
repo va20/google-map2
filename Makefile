@@ -19,4 +19,4 @@ street_map:$(OBJ)
 	$(CC) -o $@ $^ $(CPPFLAGS) $(LDFLAGS) -lm $(SDLFLAG)
 
 %.o: %.c %.h
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(CPPFLAGS) $(LDFLAGS) -lm $(SDLFLAG) 
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(CPPFLAGS) $(LDFLAGS) -lm $(SDLFLAG)

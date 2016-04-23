@@ -1,4 +1,17 @@
-Objectif 1° semaine : - Fenêtre Graphique + un truc dedans ||OK
-					  - Parsing d'un fichier XML
+1° Semaine : SDL + Parser. //SDL OK, Parser rien//
 
-Objectif 3° semaine : -Parsing du fichier XML
+3° Semaine : Parser à terminer. //Parser rien//
+
+4° Semaine : Parser à terminer. //Bounds, Noeuds, Tag OK. Way à faire//
+
+5° Semaine : Parser à terminer. //Complet, mais une erreur de segmentation à corriger//
+
+6° Semaine : Finir les dernières erreurs du Parser. //OK//
+
+7° Semaine : Corriger les calculs de dessin -> Affichage propre. //Affichage biaisé, image de travers//
+
+8° Semaine : Terminer de corriger les calculs. //OK//
+
+9° Semaine : Début du micmac des couleurs. //Bon début, sera complété au fur et à mesure de l'avancée//
+
+10° Semaine : Terminer projet minimal + relations. //OK//

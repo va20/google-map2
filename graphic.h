@@ -14,5 +14,7 @@ char* valueOf(Tag*,char*);
 
 SDL_Renderer* draw_ways(SDL_Renderer*,Way*,double,double,double,int);
 
+Way* get_Inner(Member*,Way*);
+
 #endif /* GRAPHIQUE */
 
